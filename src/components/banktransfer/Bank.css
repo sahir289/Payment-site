@@ -1,0 +1,102 @@
+.bank-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  background-color: orangered;
+  padding-inline: 20px;
+  border-radius: 10px;
+}
+
+.text {
+  font-size: 20px;
+  color: white;
+}
+
+.right-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-text {
+  font-size: 20px;
+  color: white;
+}
+
+.section-to {
+  text-align: center;
+  font-size: 18px;
+  color: black;
+  line-height: 24px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.amount-container {
+  text-align: center;
+}
+
+.amount-text {
+  font-size: 20px;
+  color: black;
+  font-weight: 500;
+}
+
+.price {
+  font-size: 22px;
+  color: orangered;
+  font-weight: 600;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  color: black;
+  font-weight: 500;
+  padding-left: 16px;
+}
+.bank-value {
+  padding-right: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: grey;
+}
+
+.details-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 8 px;
+  font-size: 18px;
+  color: black;
+  font-weight: 500;
+  padding-left: 16px;
+}
+
+.icon-copy {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.account-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.text-value {
+  font-size: 14px;
+  color: grey;
+  font-weight: 600;
+}
+
+.ant-divider {
+  margin: 10px !important;
+}

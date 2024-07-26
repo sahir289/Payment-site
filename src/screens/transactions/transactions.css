@@ -1,0 +1,106 @@
+.main-section {
+    width: max(350px, 65%);
+    min-height: 100vh;
+    padding-bottom: 10px;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 0, 41);
+    height: 50px;
+}
+
+.utr-number,
+.ant-tabs-content-holder {
+    background-color: rgb(247, 247, 247);
+}
+
+.ant-tabs-content-holder {
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    padding: 10px;
+}
+
+.utr-number {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    padding: 10px;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 120px;
+    gap: 10px;
+}
+
+.utr-number .ant-btn{
+    width: 100%;
+    margin-top: -3px;
+}
+.tabs {
+    width: 100%;
+    border-radius: 0px;
+}
+
+
+.icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 26px;
+    color: white;
+}
+
+.ant-tabs-nav-list {
+    width: 100%;
+    background-color: rgb(247, 247, 247);
+    padding: 15px;
+}
+.ant-tabs-nav{
+    margin-top: 10px !important;
+    border-radius: 5px !important;
+    overflow: hidden;
+}
+
+.ant-tabs-tab {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 16px !important;
+    flex-grow: 1;
+    border-radius: 5px !important;
+    border: none !important;
+}
+
+.ant-tabs-nav-list .ant-tabs-tab.ant-tabs-tab-active {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-color: black !important;
+    font-size: 16px !important;
+    color: white !important;
+}
+.ant-tabs-tab-btn{
+    color: rgb(182, 182, 182) !important;
+}
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: whitesmoke !important;
+}
+
+
+/* loader css */
+.loader-component {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* .ant-form-item-control-input-content .ant-input {
+    width: 100% !important;
+} */
+
+.amount-modal-inner {
+    display: flex;
+}

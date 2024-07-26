@@ -1,0 +1,14 @@
+*{
+  padding: 0px;
+  margin: 0px;
+}
+.app{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
