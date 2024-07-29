@@ -102,6 +102,13 @@ const Transactions = () => {
             return;
         }
         const data = res.data.data;
+        if (data?.expirationDate) {
+            const difference = new Date(data.expirationDate).getTime() - new Date().getTime();
+            const seconds = Math.floor(difference / 1000)
+            if (seconds > 0) {
+                setTimer(seconds);
+            }
+        }
         setExpireTime(data?.expiryTime)
         setIsModalOpen(true);
         setTransactionInformation(data || null);
@@ -109,8 +116,8 @@ const Transactions = () => {
 
     const handleUtrNumber = async (data) => {
         const updateData = {
-            usrSubmittedUtr:data?.utrNumber,
-            code:transactionsInformation?.code,
+            usrSubmittedUtr: data?.utrNumber,
+            code: transactionsInformation?.code,
             amount,
         }
         console.log("🚀 ~ handleUtrNumber ~ updateData:", updateData)
