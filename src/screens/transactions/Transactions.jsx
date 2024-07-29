@@ -102,8 +102,8 @@ const Transactions = () => {
             return;
         }
         const data = res.data.data;
-        if (data?.expirationDate) {
-            const difference = new Date(data.expirationDate).getTime() - new Date().getTime();
+        if (data?.expiryTime) {
+            const difference = new Date(data.expiryTime * 1000).getTime() - new Date().getTime();
             const seconds = Math.floor(difference / 1000)
             if (seconds > 0) {
                 setTimer(seconds);
