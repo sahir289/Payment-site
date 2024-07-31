@@ -15,17 +15,14 @@ const Home = () => {
     const res = await userAPI.generateToken({
       code: "merchant_123",
       api_key: "sampleapikey123",
-      merchant_order_id: "merch-12121",
+      merchant_order_id: "merch-12qsad",
       user_id: "zac-12"
     });
-    console.log("🚀 ~ handleGenerateUuid ~ res:", res)
     setLoading(false);
     if (res.error) {
-      message.error(res.error.message);
+      message.error(res.error.error.message);
       return;
     }
-    // const uuid = res.data.data.uuid;
-    // navigate(`/transaction/${uuid}`);
     const paymentUrl = res?.data?.data?.payInUrl; // Adjust based on your API response structure
     window.location.href = paymentUrl;
   }

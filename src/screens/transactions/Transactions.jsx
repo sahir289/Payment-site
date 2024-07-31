@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { userAPI } from '../../services';
 import "./transactions.css"
 import ModelPopUp from '../../components/modelPopup/ModelPopUp';
+import WebSockets from '../../components/webSockets/WebSockets';
 
 const Transactions = () => {
     const params = useParams();
@@ -20,7 +21,8 @@ const Transactions = () => {
     const [urlExpired, setUrlExpired] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
     const [modelData, setModelData] = useState({})
-
+    console.log("🚀 ~ Transactions ~ modelData:", modelData)
+    const [webSocketData, setWebSocketData] = useState(false);
 
     const expireUrlHandler = async () => {
         const token = params.token
@@ -28,7 +30,7 @@ const Transactions = () => {
         setUrlExpired(true)
     }
 
-    const checkPaymentStatus = async () => {
+    const checkPaymentStatusHandler = async () => {
         const token = params.token
         const res = await userAPI.checkPaymentStatus(token);
         if (res?.data?.data?.status === "Success") {
@@ -37,18 +39,20 @@ const Transactions = () => {
         }
     }
 
-    useEffect(() => {
-        console.log('dhfgkjhdf')
-        if (urlExpired === false && paymentModel === false) {
-            // const timeoutId = setTimeout(() => {
-            //     checkPaymentStatus();
-            // }, 3000);
-            setTimeout(() => {
-                // checkPaymentStatus();
-            }, 3000)
+    // useEffect(()=>{
+    //     if (webSocketData===true){
+    //         console.log("8888888888888")
+    //         checkPaymentStatus()
+    //     }
+    // },[webSocketData])
 
-            // // Clear timeout if either urlExpired or paymentModel changes before the timeout is executed
-            // return () => clearTimeout(timeoutId);
+    useEffect(() => {
+        if (urlExpired === false && paymentModel === false) {
+            
+            setTimeout(() => {
+                checkPaymentStatusHandler();
+            }, 3000)
+           
         }
     }, [urlExpired, paymentModel, timer]);
 
@@ -103,7 +107,7 @@ const Transactions = () => {
         }
         setExpireTime(data?.expiryTime)
         setIsModalOpen(true);
-        setTransactionInformation(data || null);
+
     }
 
     const handleUtrNumber = async (data) => {
@@ -121,7 +125,7 @@ const Transactions = () => {
             setPaymentModel(true)
             setModelData(res?.data?.data)
         }
-        
+
     }
 
     const handleAmount = (data) => {
@@ -129,7 +133,11 @@ const Transactions = () => {
         setIsModalOpen(false);
         setAmount(data.amount)
         const amount = data
-        const bankAssignRes = userAPI.assignBankToPayInUrl(token,amount)
+        const bankAssignRes = userAPI.assignBankToPayInUrl(token, amount).then((res) => {
+            setTransactionInformation(res?.data?.data || null);
+        }).catch((err) => {
+            console.log(err)
+        })
     }
 
     function tick() {
@@ -157,84 +165,88 @@ const Transactions = () => {
 
 
     return (
-        <div className='main-section'>
-            {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} />}
-            <header>
-                <div className="icon">
-                    <FcRating size={30} />
-                    <p>Trust Pay</p>
-                </div>
-            </header>
-            <div className='main-content'>
-                <Tabs
-                    defaultActiveKey="1"
-                    className='tabs'
-                    type="card"
-                    tabBarGutter={10}
-                >
-                    <Tabs.TabPane tab='Upi' key='1'>
-                        <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
-                    </Tabs.TabPane>
-                    <Tabs.TabPane tab='Bank Transfer' key='3'>
-                        <Bank {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
-                    </Tabs.TabPane>
-                </Tabs>
-                <Form layout='vertical' onFinish={handleUtrNumber}>
-                    <div className="utr-number">
-                        <Form.Item
-                            label={
-                                <span>
-                                    Enter UTR Number
-                                    <span className='text-red-500' style={{ marginLeft: 8 }}>
-                                        (* UTR can be submitted only once)
+        <>
+          <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} />
+            
+            <div className='main-section'>
+                {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} />}
+                <header>
+                    <div className="icon">
+                        <FcRating size={30} />
+                        <p>Trust Pay</p>
+                    </div>
+                </header>
+                <div className='main-content'>
+                    <Tabs
+                        defaultActiveKey="1"
+                        className='tabs'
+                        type="card"
+                        tabBarGutter={10}
+                    >
+                        <Tabs.TabPane tab='Upi' key='1'>
+                            <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
+                        </Tabs.TabPane>
+                        <Tabs.TabPane tab='Bank Transfer' key='3'>
+                            <Bank {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
+                        </Tabs.TabPane>
+                    </Tabs>
+                    <Form layout='vertical' onFinish={handleUtrNumber}>
+                        <div className="utr-number">
+                            <Form.Item
+                                label={
+                                    <span>
+                                        Enter UTR Number
+                                        <span className='text-red-500' style={{ marginLeft: 8 }}>
+                                            (* UTR can be submitted only once)
+                                        </span>
                                     </span>
-                                </span>
-                            }
-                            name="utrNumber"
-                            rules={[
-                                { required: true, message: 'Please enter UTR no' },
-                                { pattern: /^\d{12}$/, message: 'UTR number must be exactly 12 digits' }
-                            ]}
-                        >
-                            <Input
-                                type='text'
-                                size='large'
-                            />
-                        </Form.Item>
-
-                        <Form.Item name="" label=" ">
-                            <Button
-                                type='primary'
-                                size='large'
-                                htmlType='submit'
-                                loading={processing}
+                                }
+                                name="utrNumber"
+                                rules={[
+                                    { required: true, message: 'Please enter UTR no' },
+                                    { pattern: /^\d{12}$/, message: 'UTR number must be exactly 12 digits' }
+                                ]}
                             >
-                                Submit
-                            </Button>
-                        </Form.Item>
-                    </div>
-                </Form>
-            </div>
-            <Modal title="Attention" open={isModalOpen} footer={false}>
-                <Form layout='vertical' onFinish={handleAmount}>
-                    <div>
-                        <Form.Item
-                            name='amount'
-                            label="Please enter the amount for this transaction"
-                            rules={[{ required: true, message: 'Please enter amount' }]}
-                        >
-                            <Input
-                                type='number'
-                                placeholder='Enter New Amount'
-                                size='large'
-                                addonAfter="₹"
-                            />
-                        </Form.Item>
-                        <Button type='primary' htmlType='submit'>Submit</Button>
-                    </div>
-                </Form>
-            </Modal>
-        </div >
+                                <Input
+                                    type='text'
+                                    size='large'
+                                />
+                            </Form.Item>
+
+                            <Form.Item name="" label=" ">
+                                <Button
+                                    type='primary'
+                                    size='large'
+                                    htmlType='submit'
+                                    loading={processing}
+                                >
+                                    Submit
+                                </Button>
+                            </Form.Item>
+                        </div>
+                    </Form>
+                </div>
+                <Modal title="Attention" open={isModalOpen} footer={false}>
+                    <Form layout='vertical' onFinish={handleAmount}>
+                        <div>
+                            <Form.Item
+                                name='amount'
+                                label="Please enter the amount for this transaction"
+                                rules={[{ required: true, message: 'Please enter amount' }]}
+                            >
+                                <Input
+                                    type='number'
+                                    placeholder='Enter New Amount'
+                                    size='large'
+                                    addonAfter="₹"
+                                />
+                            </Form.Item>
+                            <Button type='primary' htmlType='submit'>Submit</Button>
+                        </div>
+                    </Form>
+                </Modal>
+            </div >
+        </>
 
     )
 }

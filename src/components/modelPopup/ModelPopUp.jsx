@@ -17,7 +17,9 @@ const ModelPopUp = (props) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             // Open the URL in a new tab
-            window.open(modelData?.return_url || "https://www.google.com/");
+            if (modelData?.status === "Success") {
+                window.open(modelData?.return_url);
+            }
         }, 5000);
 
         // Cleanup the timeout if the component unmounts

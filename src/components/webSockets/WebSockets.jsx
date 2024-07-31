@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react';
-
+import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 export const socket = io(`${import.meta.env.VITE_API_WS_URL}`);
 
-console.log("🚀 ~ socket:", socket)
-const WebSockets = () => {
-  const [message, setMessage] = useState('');
-  console.log("🚀 ~ WebSockets ~ message:", message)
+
+const WebSockets = ({ checkPaymentStatusHandler, setWebSocketData }) => {
+  console.log("🚀 ~ WebSockets ~ setWebSocketData:", setWebSocketData)
+  console.log("🚀 ~ WebSockets ~ checkPaymentStatusHandler:", checkPaymentStatusHandler)
+  // const { checkPaymentStatusHandler } = props
+  const testHandler = () => {
+    console.log("hjbdshkkdfsj")
+    setWebSocketData(true);
+    // checkPaymentStatusHandler();
+  }
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -16,6 +21,9 @@ const WebSockets = () => {
     socket.on('new-entry', (data) => {
       console.log('New entry received:', data);
       // Handle the new entry data
+      
+      testHandler()
+      
     });
 
     socket.on('broadcast-message', (data) => {
