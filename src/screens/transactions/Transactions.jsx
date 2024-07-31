@@ -18,9 +18,7 @@ const Transactions = () => {
     const [timer, setTimer] = useState(10 * 60);
     const [expireTime, setExpireTime] = useState(10000000000)
     const [urlExpired, setUrlExpired] = useState(false)
-    console.log("🚀 ~ Transactions ~ urlExpired:", urlExpired)
     const [paymentModel, setPaymentModel] = useState(false)
-    console.log("🚀 ~ Transactions ~ paymentModel:", paymentModel)
     const [modelData, setModelData] = useState({})
 
 
@@ -33,8 +31,6 @@ const Transactions = () => {
     const checkPaymentStatus = async () => {
         const token = params.token
         const res = await userAPI.checkPaymentStatus(token);
-        console.log("🚀 ~ checkPaymentStatus ~ res:", res)
-        console.log("🚀 ~ checkPaymentStatus ~ res?.data?.data?.status:", res?.data?.data?.status)
         if (res?.data?.data?.status === "Success") {
             setPaymentModel(true)
             setModelData(res?.data?.data)
@@ -43,13 +39,12 @@ const Transactions = () => {
 
     useEffect(() => {
         console.log('dhfgkjhdf')
-        console.log("🚀 ~ useEffect ~ urlExpired === false && paymentModel === false:", urlExpired === false && paymentModel === false)
         if (urlExpired === false && paymentModel === false) {
             // const timeoutId = setTimeout(() => {
             //     checkPaymentStatus();
             // }, 3000);
             setTimeout(() => {
-                checkPaymentStatus();
+                // checkPaymentStatus();
             }, 3000)
 
             // // Clear timeout if either urlExpired or paymentModel changes before the timeout is executed
@@ -77,9 +72,6 @@ const Transactions = () => {
 
     useEffect(() => {
         const currentTime = Math.floor(Date.now() / 1000);
-        console.log("🚀 ~ useEffect ~ currentTime:", currentTime)
-        console.log("🚀 ~ useEffect ~ expireTime:", expireTime)
-        console.log("🚀 ~ useEffect ~ currentTime > expireTime:", currentTime > expireTime)
         if (currentTime > expireTime) {
             expireUrlHandler();
         }
@@ -120,34 +112,24 @@ const Transactions = () => {
             code: transactionsInformation?.code,
             amount,
         }
-        console.log("🚀 ~ handleUtrNumber ~ updateData:", updateData)
         setProcessing(true);
         const res = await userAPI.processTransaction(params.token, {
             ...updateData,
         })
-        console.log("🚀 ~ handleUtrNumber ~ res:", res)
         setProcessing(false);
         if (res?.data?.data) {
             setPaymentModel(true)
             setModelData(res?.data?.data)
         }
-        // if (res.error) {
-        //     setStatus({
-        //         status: res.error?.error?.status || "error",
-        //         message: res.error.message,
-        //     })
-        //     return;
-        // }
-
-        // setStatus({
-        //     status: "success",
-        //     message: "Your transaction has processed successfully!",
-        // })
+        
     }
 
     const handleAmount = (data) => {
+        const token = params.token
         setIsModalOpen(false);
         setAmount(data.amount)
+        const amount = data
+        const bankAssignRes = userAPI.assignBankToPayInUrl(token,amount)
     }
 
     function tick() {
@@ -180,7 +162,7 @@ const Transactions = () => {
             <header>
                 <div className="icon">
                     <FcRating size={30} />
-                    <p>XiCash</p>
+                    <p>Trust Pay</p>
                 </div>
             </header>
             <div className='main-content'>
@@ -245,7 +227,7 @@ const Transactions = () => {
                                 type='number'
                                 placeholder='Enter New Amount'
                                 size='large'
-                                addonAfter="$"
+                                addonAfter="₹"
                             />
                         </Form.Item>
                         <Button type='primary' htmlType='submit'>Submit</Button>
