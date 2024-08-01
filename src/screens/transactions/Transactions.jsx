@@ -162,18 +162,18 @@ const Transactions = () => {
     if (status) {
         return <Result {...status} />
     }
-
-
+    console.log("🚀 ~ Transactions ~ checkPaymentStatusHandler:", checkPaymentStatusHandler)
     return (
         <>
-          <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} />
-            
+          {/* <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} /> */}
+
             <div className='main-section'>
                 {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} />}
                 <header>
                     <div className="icon">
                         <FcRating size={30} />
                         <p>Trust Pay</p>
+                        
                     </div>
                 </header>
                 <div className='main-content'>
@@ -250,5 +250,6 @@ const Transactions = () => {
 
     )
 }
+  
 
 export default Transactions
