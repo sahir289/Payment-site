@@ -18,15 +18,22 @@ const Transactions = () => {
     const [status, setStatus] = useState(null);
     const [timer, setTimer] = useState(10 * 60);
     const [expireTime, setExpireTime] = useState(10000000000)
+    console.log("🚀 ~ Transactions ~ expireTime:", expireTime)
     const [urlExpired, setUrlExpired] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
     const [modelData, setModelData] = useState({})
     console.log("🚀 ~ Transactions ~ modelData:", modelData)
-    const [webSocketData, setWebSocketData] = useState(false);
+    // const [webSocketData, setWebSocketData] = useState(false);
+    const [fileData, setFileData] = useState(null);
+    console.log("🚀 ~ Transactions ~ fileData:", fileData)
+
+
 
     const expireUrlHandler = async () => {
         const token = params.token
-        const res = await userAPI.validateToken(token);
+        const validateRes = await userAPI.validateToken(token);
+        const expiryRes = await userAPI.expireUrl(token);
+
         setUrlExpired(true)
     }
 
@@ -48,11 +55,11 @@ const Transactions = () => {
 
     useEffect(() => {
         if (urlExpired === false && paymentModel === false) {
-            
+
             setTimeout(() => {
                 checkPaymentStatusHandler();
             }, 3000)
-           
+
         }
     }, [urlExpired, paymentModel, timer]);
 
@@ -65,6 +72,7 @@ const Transactions = () => {
                 status: "403",
                 message: "The Link has been expired!",
             })
+            expireUrlHandler()
             return;
         }
         const timerID = setTimeout(() => tick(), 1000);
@@ -101,6 +109,8 @@ const Transactions = () => {
         if (data?.expiryTime) {
             const difference = new Date(data.expiryTime * 1000).getTime() - new Date().getTime();
             const seconds = Math.floor(difference / 1000)
+            console.log("🚀 ~ handleValidateToken ~ seconds:", seconds)
+            console.log("🚀 ~ handleValidateToken ~ seconds > 0:", seconds > 0)
             if (seconds > 0) {
                 setTimer(seconds);
             }
@@ -150,6 +160,37 @@ const Transactions = () => {
         return `${minutes}:${seconds}`;
     };
 
+
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+
+        setFileData(file);
+    };
+
+    const handleImgSubmit = async () => {
+        const token = params.token
+        if (fileData !== undefined || fileData !== null) {
+            const formData = new FormData();
+            formData.append("file", fileData);
+            const amountData = amount;
+            console.log("🚀 ~ handleImgSubmit ~ amountData:", amountData)
+            setProcessing(true);
+            const imgSubmitRes = await userAPI.imageSubmit(token, formData, amount).then((res) => {
+                console.log(res,'qweqwqwqwwq')
+                setPaymentModel(true)
+                setModelData(res?.data?.data)
+
+            }).catch((err) => {
+                console.log(err);
+            })
+            setProcessing(false);
+        }
+    }
+
+
+
+
     const formattedTime = formatTime(timer);
     if (loading) {
         return (
@@ -162,10 +203,12 @@ const Transactions = () => {
     if (status) {
         return <Result {...status} />
     }
-    console.log("🚀 ~ Transactions ~ checkPaymentStatusHandler:", checkPaymentStatusHandler)
+
+
+
     return (
         <>
-          {/* <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} /> */}
+            {/* <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} /> */}
 
             <div className='main-section'>
                 {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} />}
@@ -173,24 +216,59 @@ const Transactions = () => {
                     <div className="icon">
                         <FcRating size={30} />
                         <p>Trust Pay</p>
-                        
+
                     </div>
                 </header>
-                <div className='main-content'>
+                <div className='main-content' >
                     <Tabs
                         defaultActiveKey="1"
                         className='tabs'
                         type="card"
-                        tabBarGutter={10}
+                        tabBarGutter={5}
+                        style={{ marginTop: "-10px" }}
                     >
-                        <Tabs.TabPane tab='Upi' key='1'>
+                        <Tabs.TabPane tab='Upi' key='1' >
                             <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
                         </Tabs.TabPane>
                         <Tabs.TabPane tab='Bank Transfer' key='3'>
                             <Bank {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
                         </Tabs.TabPane>
                     </Tabs>
-                    <Form layout='vertical' onFinish={handleUtrNumber}>
+
+                    <Form layout='vertical' onFinish={handleImgSubmit} className='m-0 p-0' >
+                        <Form.Item
+                            label={
+                                <span className=''>
+                                    Add the Image here
+                                </span>
+                            }
+                            className=' ps-6 w-full'
+                            style={{ backgroundColor: "#f7f7f7" }}
+                        >
+                            <div className='flex justify-between w-full'>
+                                <input
+                                    accept="image/*"
+                                    // multiple=""
+                                    className="w-full h-10"
+                                    type="file"
+                                    // ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                />
+                                <Button
+                                    type='primary'
+                                    size='middle'
+                                    htmlType='submit'
+                                    loading={processing}
+                                    className='pe-5 mr-2 w-[132px]'
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </Form.Item>
+
+
+                    </Form>
+                    <Form layout='vertical' onFinish={handleUtrNumber} style={{ marginTop: "-24px" }}>
                         <div className="utr-number">
                             <Form.Item
                                 label={
@@ -209,14 +287,14 @@ const Transactions = () => {
                             >
                                 <Input
                                     type='text'
-                                    size='large'
+                                    size='middle'
                                 />
                             </Form.Item>
 
                             <Form.Item name="" label=" ">
                                 <Button
                                     type='primary'
-                                    size='large'
+                                    size='middle'
                                     htmlType='submit'
                                     loading={processing}
                                 >
@@ -225,6 +303,7 @@ const Transactions = () => {
                             </Form.Item>
                         </div>
                     </Form>
+
                 </div>
                 <Modal title="Attention" open={isModalOpen} footer={false}>
                     <Form layout='vertical' onFinish={handleAmount}>
@@ -250,6 +329,6 @@ const Transactions = () => {
 
     )
 }
-  
+
 
 export default Transactions

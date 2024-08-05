@@ -14,23 +14,25 @@ header {
 
 .utr-number,
 .ant-tabs-content-holder {
-    background-color: rgb(247, 247, 247);
+    background-color: #f7f7f7;
 }
 
 .ant-tabs-content-holder {
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
     padding: 10px;
+    margin-top: -16px;
 }
 
 .utr-number {
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     display: grid;
     align-items: center;
     grid-template-columns: 1fr 120px;
-    gap: 10px;
+    /* gap: 10px; */
 }
 
 .utr-number .ant-btn{

@@ -10,7 +10,7 @@
 .Upi-details{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 .text-value{
   font-size: 14px;

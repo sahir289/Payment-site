@@ -8,8 +8,8 @@ import "./Upi.css";
 
 const Upi = ({ code, amount, upi_id,formattedTime,ac_name }) => {
   return (
-    <section className='upi-section'>
-      <div className="bank-container">
+    <section className='upi-section' >
+      <div className="bank-container" >
         <p className='text'>Payment Time Left</p>
         <div className="right-area">
           <MdOutlineTimer size={20} color='white' />
