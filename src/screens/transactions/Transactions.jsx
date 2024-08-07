@@ -25,6 +25,7 @@ const Transactions = () => {
     console.log("🚀 ~ Transactions ~ modelData:", modelData)
     // const [webSocketData, setWebSocketData] = useState(false);
     const [fileData, setFileData] = useState(null);
+    const [redirected,setRedirected]=useState(false)
     console.log("🚀 ~ Transactions ~ fileData:", fileData)
 
 
@@ -48,11 +49,10 @@ const Transactions = () => {
 
 
     useEffect(() => {
-        if (urlExpired === false && paymentModel === false) {
+        if (urlExpired === false && paymentModel === false && !redirected) {
             setTimeout(() => {
                 checkPaymentStatusHandler();
             }, 3000)
-
         }
     }, [urlExpired, paymentModel, timer]);
 
@@ -204,7 +204,7 @@ const Transactions = () => {
             {/* <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} /> */}
 
             <div className='main-section'>
-                {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} />}
+                {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} redirected={redirected} setRedirected={setRedirected} />}
                 <header>
                     <div className="icon">
                         <FcRating size={30} />
