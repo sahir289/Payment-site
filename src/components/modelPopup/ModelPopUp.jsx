@@ -4,7 +4,7 @@ import { CheckIcon, ClockIcon } from '../../utils/constants';
 
 
 const ModelPopUp = (props) => {
-    const { paymentModel, modelData } = props;
+    const { paymentModel, modelData,redirected,setRedirected } = props;
     console.log("🚀 ~ ModelPopUp ~ modelData:", modelData)
     console.log("🚀 ~ ModelPopUp ~ paymentModel:", paymentModel)
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +19,7 @@ const ModelPopUp = (props) => {
             // Open the URL in a new tab
             // if (modelData?.status === "Success") {
                 window.open(modelData?.return_url);
+                setRedirected(true);
             // }
         }, 5000);
 
