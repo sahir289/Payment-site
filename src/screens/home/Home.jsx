@@ -14,7 +14,7 @@ const Home = () => {
 
     const res = await userAPI.generateToken({
       code: "merchant_123",
-      merchant_order_id: "merch-12qsad",
+      merchant_order_id: "Hs-9Jq10040663382596042",
       user_id: "zac-12"
     });
     setLoading(false);

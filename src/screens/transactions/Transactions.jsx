@@ -46,16 +46,9 @@ const Transactions = () => {
         }
     }
 
-    // useEffect(()=>{
-    //     if (webSocketData===true){
-    //         console.log("8888888888888")
-    //         checkPaymentStatus()
-    //     }
-    // },[webSocketData])
 
     useEffect(() => {
         if (urlExpired === false && paymentModel === false) {
-
             setTimeout(() => {
                 checkPaymentStatusHandler();
             }, 3000)
