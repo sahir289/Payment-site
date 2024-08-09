@@ -18,16 +18,12 @@ const Transactions = () => {
     const [status, setStatus] = useState(null);
     const [timer, setTimer] = useState(10 * 60);
     const [expireTime, setExpireTime] = useState(10000000000)
-    console.log("🚀 ~ Transactions ~ expireTime:", expireTime)
     const [urlExpired, setUrlExpired] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
     const [modelData, setModelData] = useState({})
-    console.log("🚀 ~ Transactions ~ modelData:", modelData)
     // const [webSocketData, setWebSocketData] = useState(false);
     const [fileData, setFileData] = useState(null);
     const [redirected,setRedirected]=useState(false)
-    console.log("🚀 ~ Transactions ~ fileData:", fileData)
-
 
 
     const expireUrlHandler = async () => {
@@ -44,6 +40,9 @@ const Transactions = () => {
         if (res?.data?.data?.status === "Success") {
             setPaymentModel(true)
             setModelData(res?.data?.data)
+        }
+        else if (res?.error?.error?.status === 400){
+            setUrlExpired(true)
         }
     }
 
@@ -102,8 +101,6 @@ const Transactions = () => {
         if (data?.expiryTime) {
             const difference = new Date(data.expiryTime * 1000).getTime() - new Date().getTime();
             const seconds = Math.floor(difference / 1000)
-            console.log("🚀 ~ handleValidateToken ~ seconds:", seconds)
-            console.log("🚀 ~ handleValidateToken ~ seconds > 0:", seconds > 0)
             if (seconds > 0) {
                 setTimer(seconds);
             }
@@ -167,7 +164,6 @@ const Transactions = () => {
             const formData = new FormData();
             formData.append("file", fileData);
             const amountData = amount;
-            console.log("🚀 ~ handleImgSubmit ~ amountData:", amountData)
             setProcessing(true);
             const imgSubmitRes = await userAPI.imageSubmit(token, formData, amount).then((res) => {
                 console.log(res,'qweqwqwqwwq')
