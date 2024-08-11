@@ -42,6 +42,10 @@ const Transactions = () => {
             setModelData(res?.data?.data)
         }
         else if (res?.error?.error?.status === 400){
+            setStatus({
+                status: "400",
+                message: "Url is Already expired!",
+            })
             setUrlExpired(true)
         }
     }
@@ -135,8 +139,16 @@ const Transactions = () => {
         const amount = data
         const bankAssignRes = userAPI.assignBankToPayInUrl(token, amount).then((res) => {
             setTransactionInformation(res?.data?.data || null);
+            if (res.error?.error?.status ===404){
+                setStatus({
+                    status: "404",
+                    message: "Bank is not linked with the merchant!",
+                })
+                expireUrlHandler()
+            }
         }).catch((err) => {
             console.log(err)
+            
         })
     }
 
@@ -166,7 +178,6 @@ const Transactions = () => {
             const amountData = amount;
             setProcessing(true);
             const imgSubmitRes = await userAPI.imageSubmit(token, formData, amount).then((res) => {
-                console.log(res,'qweqwqwqwwq')
                 setPaymentModel(true)
                 setModelData(res?.data?.data)
 
