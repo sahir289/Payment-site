@@ -9,8 +9,8 @@ function App() {
     <div className='app'>
       {/* <WebSockets/> */}
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/test' element={<Test />} />
+        {/* <Route path='/' element={<Home />} /> */}
+        {/* <Route path='/test' element={<Test />} /> */}
 
         <Route path='/transaction/:token' element={<Transactions />} />
       </Routes>
