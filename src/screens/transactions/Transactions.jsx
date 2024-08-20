@@ -227,7 +227,7 @@ const Transactions = () => {
                         tabBarGutter={5}
                         style={{ marginTop: "-10px" }}
                     >
-                        <Tabs.TabPane tab='Upi' key='1' >
+                        <Tabs.TabPane tab='UPI' key='1' >
                             <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
                         </Tabs.TabPane>
                         <Tabs.TabPane tab='Bank Transfer' key='3'>
