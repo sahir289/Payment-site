@@ -4,7 +4,7 @@ import { CheckIcon, ClockIcon } from '../../utils/constants';
 
 
 const ModelPopUp = (props) => {
-    const { paymentModel, modelData,redirected,setRedirected } = props;
+    const { paymentModel, modelData, redirected, setRedirected } = props;
     console.log("🚀 ~ ModelPopUp ~ modelData:", modelData)
     console.log("🚀 ~ ModelPopUp ~ paymentModel:", paymentModel)
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,10 +17,9 @@ const ModelPopUp = (props) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             // Open the URL in a new tab
-            // if (modelData?.status === "Success") {
-                window.open(modelData?.return_url);
-                setRedirected(true);
-            // }
+            // window.open(modelData?.return_url);
+            window.location.href = modelData?.return_url;
+            setRedirected(true);
         }, 5000);
 
         // Cleanup the timeout if the component unmounts
@@ -37,15 +36,17 @@ const ModelPopUp = (props) => {
 
             </div>
             <div className='flex justify-center mt-5 text-3xl  font-bold'>
-                <p>{modelData?.status === "Success" && "Payment completed"}{modelData?.status === "PENDING" && "UTR Submitted!!!"}{modelData?.status === "DUPLICATE" && "Duplicate UTR found!!!"}</p>
+                <p>{modelData?.status === "Success" && "Payment completed"}{modelData?.status === "PENDING" && "UTR Submitted!!!"}{modelData?.status === "DUPLICATE" && "Duplicate UTR found!!!"}
+                    {modelData?.status === "DISPUTE" && "There is an Dispute in payment"}
+                </p>
             </div>
             {modelData?.status === "PENDING" && <div className='text-center '>Your points will be credited in few minutes</div>}
             {modelData?.status === "DUPLICATE" && <div className='text-center text-red-600 '>Please contact to customer services for further info.</div>}
-
+            {modelData?.status === "DISPUTE" && <div className='text-center text-red-600 '>Please contact to customer services for further info.</div>}
 
             <div className='mt-16'>
                 <div className='flex justify-between'>
-                    <p className='text-xl   '>Amount</p>
+                    <p className='text-xl '>Amount</p>
                     <p className='text-xl  font-bold '>{modelData?.status === "Success" ? modelData?.amount : modelData?.status === "PENDING" ? modelData?.amount : "--"}</p>
                 </div>
                 <div className='flex justify-between mt-6'>

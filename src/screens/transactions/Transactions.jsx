@@ -7,6 +7,7 @@ import { userAPI } from '../../services';
 import "./transactions.css"
 import ModelPopUp from '../../components/modelPopup/ModelPopUp';
 import WebSockets from '../../components/webSockets/WebSockets';
+import { ErrorImg } from '../../utils/constants';
 
 const Transactions = () => {
     const params = useParams();
@@ -18,12 +19,10 @@ const Transactions = () => {
     const [status, setStatus] = useState(null);
     const [timer, setTimer] = useState(10 * 60);
     const [expireTime, setExpireTime] = useState(10000000000)
-    const [urlExpired, setUrlExpired] = useState(false)
     const [paymentModel, setPaymentModel] = useState(false)
     const [modelData, setModelData] = useState({})
-    // const [webSocketData, setWebSocketData] = useState(false);
     const [fileData, setFileData] = useState(null);
-    const [redirected,setRedirected]=useState(false)
+    const [redirected, setRedirected] = useState(false)
 
 
     const expireUrlHandler = async () => {
@@ -31,34 +30,29 @@ const Transactions = () => {
         const validateRes = await userAPI.validateToken(token);
         const expiryRes = await userAPI.expireUrl(token);
 
-        setUrlExpired(true)
     }
 
     const checkPaymentStatusHandler = async () => {
         const token = params.token
         const res = await userAPI.checkPaymentStatus(token);
+        console.log("🚀 ~ checkPaymentStatusHandler ~ res:", res)
         if (res?.data?.data?.status === "Success") {
             setPaymentModel(true)
             setModelData(res?.data?.data)
         }
-        else if (res?.error?.error?.status === 400){
-            setStatus({
-                status: "400",
-                message: "Url is Already expired!",
-            })
-            setUrlExpired(true)
+        else if (res?.data?.data?.status === "DISPUTE") {
+            setPaymentModel(true)
+            setModelData(res?.data?.data)
+        }
+        else if (res?.error?.error?.status === 400) {
+            setInterval(() => {
+                setStatus({
+                    status: "400",
+                    message: "Url is Already expired!",
+                })
+            }, 10000)
         }
     }
-
-
-    useEffect(() => {
-        if (urlExpired === false && paymentModel === false && !redirected) {
-            setTimeout(() => {
-                checkPaymentStatusHandler();
-            }, 3000)
-        }
-    }, [urlExpired, paymentModel, timer]);
-
 
 
     useEffect(() => {
@@ -139,7 +133,7 @@ const Transactions = () => {
         const amount = data
         const bankAssignRes = userAPI.assignBankToPayInUrl(token, amount).then((res) => {
             setTransactionInformation(res?.data?.data || null);
-            if (res.error?.error?.status ===404){
+            if (res.error?.error?.status === 404) {
                 setStatus({
                     status: "404",
                     message: "Bank is not linked with the merchant!",
@@ -148,7 +142,7 @@ const Transactions = () => {
             }
         }).catch((err) => {
             console.log(err)
-            
+
         })
     }
 
@@ -192,139 +186,140 @@ const Transactions = () => {
 
 
     const formattedTime = formatTime(timer);
-    if (loading) {
-        return (
-            <div className='loader-component'>
-                <Spin />
-            </div>
-        )
-    }
 
-    if (status) {
-        return <Result {...status} />
-    }
 
 
 
     return (
         <>
-            {/* <WebSockets checkPaymentStatusHandler={()=>{checkPaymentStatusHandler()}} setWebSocketData={setWebSocketData} /> */}
+            <WebSockets checkPaymentStatusHandler={checkPaymentStatusHandler} />
 
-            <div className='main-section'>
-                {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} redirected={redirected} setRedirected={setRedirected} />}
-                <header>
-                    <div className="icon">
-                        <FcRating size={30} />
-                        <p>Trust Pay</p>
+            {loading ? <Spin /> :
+                <>{status !== null ? (
+                    <>
+                        <ErrorImg />
+                        <div className='font-serif text-2xl bg-blue-400 p-6 font-semibold rounded-lg mt-2'>
+                            <p className=''>Status : {status?.status}</p>
+                            <p>Message: {status?.message}</p>
+                        </div>
+                    </>)
+                    : <><div className='main-section'>
+                        {paymentModel === true && <ModelPopUp paymentModel={paymentModel} modelData={modelData} redirected={redirected} setRedirected={setRedirected} />}
+                        <header>
+                            <div className="icon">
+                                <FcRating size={30} />
+                                <p>Trust Pay</p>
 
-                    </div>
-                </header>
-                <div className='main-content' >
-                    <Tabs
-                        defaultActiveKey="1"
-                        className='tabs'
-                        type="card"
-                        tabBarGutter={5}
-                        style={{ marginTop: "-10px" }}
-                    >
-                        <Tabs.TabPane tab='UPI' key='1' >
-                            <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
-                        </Tabs.TabPane>
-                        <Tabs.TabPane tab='Bank Transfer' key='3'>
-                            <Bank {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
-                        </Tabs.TabPane>
-                    </Tabs>
-
-                    <Form layout='vertical' onFinish={handleImgSubmit} className='m-0 p-0' >
-                        <Form.Item
-                            label={
-                                <span className=''>
-                                    Add the Image here
-                                </span>
-                            }
-                            className=' ps-6 w-full'
-                            style={{ backgroundColor: "#f7f7f7" }}
-                        >
-                            <div className='flex justify-between w-full'>
-                                <input
-                                    accept="image/*"
-                                    // multiple=""
-                                    className="w-full h-10"
-                                    type="file"
-                                    // ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                />
-                                <Button
-                                    type='primary'
-                                    size='middle'
-                                    htmlType='submit'
-                                    loading={processing}
-                                    className='pe-5 mr-2 w-[132px]'
-                                >
-                                    Submit
-                                </Button>
                             </div>
-                        </Form.Item>
+                        </header>
+                        <div className='main-content' >
+                            <Tabs
+                                defaultActiveKey="1"
+                                className='tabs'
+                                type="card"
+                                tabBarGutter={5}
+                                style={{ marginTop: "-10px" }}
+                            >
+                                <Tabs.TabPane tab='UPI' key='1' >
+                                    <Upi {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
+                                </Tabs.TabPane>
+                                <Tabs.TabPane tab='Bank Transfer' key='3'>
+                                    <Bank {...transactionsInformation} amount={amount} formattedTime={formattedTime} />
+                                </Tabs.TabPane>
+                            </Tabs>
 
-
-                    </Form>
-                    <Form layout='vertical' onFinish={handleUtrNumber} style={{ marginTop: "-24px" }}>
-                        <div className="utr-number">
-                            <Form.Item
-                                label={
-                                    <span>
-                                        Enter UTR Number
-                                        <span className='text-red-500' style={{ marginLeft: 8 }}>
-                                            (* UTR can be submitted only once)
+                            <Form layout='vertical' onFinish={handleImgSubmit} className='m-0 p-0' >
+                                <Form.Item
+                                    label={
+                                        <span className=''>
+                                            Add the Image here
                                         </span>
-                                    </span>
-                                }
-                                name="utrNumber"
-                                rules={[
-                                    { required: true, message: 'Please enter UTR no' },
-                                    { pattern: /^\d{12}$/, message: 'UTR number must be exactly 12 digits' }
-                                ]}
-                            >
-                                <Input
-                                    type='text'
-                                    size='middle'
-                                />
-                            </Form.Item>
-
-                            <Form.Item name="" label=" ">
-                                <Button
-                                    type='primary'
-                                    size='middle'
-                                    htmlType='submit'
-                                    loading={processing}
+                                    }
+                                    className=' ps-6 w-full'
+                                    style={{ backgroundColor: "#f7f7f7" }}
                                 >
-                                    Submit
-                                </Button>
-                            </Form.Item>
-                        </div>
-                    </Form>
+                                    <div className='flex justify-between w-full'>
+                                        <input
+                                            accept="image/*"
+                                            // multiple=""
+                                            className="w-full h-10"
+                                            type="file"
+                                            // ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                        />
+                                        <Button
+                                            type='primary'
+                                            size='middle'
+                                            htmlType='submit'
+                                            loading={processing}
+                                            className='pe-5 mr-2 w-[132px]'
+                                        >
+                                            Submit
+                                        </Button>
+                                    </div>
+                                </Form.Item>
 
-                </div>
-                <Modal title="Attention" open={isModalOpen} footer={false}>
-                    <Form layout='vertical' onFinish={handleAmount}>
-                        <div>
-                            <Form.Item
-                                name='amount'
-                                label="Please enter the amount for this transaction"
-                                rules={[{ required: true, message: 'Please enter amount' }]}
-                            >
-                                <Input
-                                    type='number'
-                                    placeholder='Enter New Amount'
-                                    size='large'
-                                    addonAfter="₹"
-                                />
-                            </Form.Item>
-                            <Button type='primary' htmlType='submit'>Submit</Button>
+
+                            </Form>
+                            <Form layout='vertical' onFinish={handleUtrNumber} style={{ marginTop: "-24px" }}>
+                                <div className="utr-number">
+                                    <Form.Item
+                                        label={
+                                            <span>
+                                                Enter UTR Number
+                                                <span className='text-red-500' style={{ marginLeft: 8 }}>
+                                                    (* UTR can be submitted only once)
+                                                </span>
+                                            </span>
+                                        }
+                                        name="utrNumber"
+                                        rules={[
+                                            { required: true, message: 'Please enter UTR no' },
+                                            { pattern: /^\d{12}$/, message: 'UTR number must be exactly 12 digits' }
+                                        ]}
+                                    >
+                                        <Input
+                                            type='text'
+                                            size='middle'
+                                        />
+                                    </Form.Item>
+
+                                    <Form.Item name="" label=" ">
+                                        <Button
+                                            type='primary'
+                                            size='middle'
+                                            htmlType='submit'
+                                            loading={processing}
+                                        >
+                                            Submit
+                                        </Button>
+                                    </Form.Item>
+                                </div>
+                            </Form>
+
                         </div>
-                    </Form>
-                </Modal>
-            </div >
+                        <Modal title="Attention" open={isModalOpen} footer={false}>
+                            <Form layout='vertical' onFinish={handleAmount}>
+                                <div>
+                                    <Form.Item
+                                        name='amount'
+                                        label="Please enter the amount for this transaction"
+                                        rules={[{ required: true, message: 'Please enter amount' }]}
+                                    >
+                                        <Input
+                                            type='number'
+                                            placeholder='Enter New Amount'
+                                            size='large'
+                                            addonAfter="₹"
+                                        />
+                                    </Form.Item>
+                                    <Button type='primary' htmlType='submit'>Submit</Button>
+                                </div>
+                            </Form>
+                        </Modal>
+                    </div ></>
+                }</>
+            }
         </>
 
     )
