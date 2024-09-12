@@ -33,7 +33,6 @@ const Transactions = () => {
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
-    console.log("🚀 ~ checkPaymentStatusHandler ~ res:", res);
     if (res?.data?.data?.status === "Success") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
