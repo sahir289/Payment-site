@@ -31,8 +31,6 @@ const Transactions = () => {
 
   const handleExpireURL = async (token) => {
     const validateRes = await userAPI.validateToken(token);
-    console.log('validatte res===>', validateRes);
-    console.log('check if value=====>',validateRes.data?.data?.one_time_used);
     if (validateRes.data?.data?.one_time_used) {
       setStatus({
         status: "403",
@@ -41,7 +39,6 @@ const Transactions = () => {
       return;
     }
     const expireRes = await payInExpireURL(token)
-    console.log('res of expire is', expireRes);
 
   }
   const expireUrlHandler = async () => {
