@@ -8,6 +8,7 @@ import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
+import { payInExpireURL } from "../../services/user";
 
 const Transactions = () => {
   const params = useParams();
@@ -24,6 +25,25 @@ const Transactions = () => {
   const [fileData, setFileData] = useState(null);
   const [redirected, setRedirected] = useState(false);
 
+  useEffect(() => {
+    handleExpireURL(params.token);
+  }, [params.token])
+
+  const handleExpireURL = async (token) => {
+    const validateRes = await userAPI.validateToken(token);
+    console.log('validatte res===>', validateRes);
+    console.log('check if value=====>',validateRes.data?.data?.one_time_used);
+    if (validateRes.data?.data?.one_time_used) {
+      setStatus({
+        status: "403",
+        message: "The Link has been expired!",
+      });
+      return;
+    }
+    const expireRes = await payInExpireURL(token)
+    console.log('res of expire is', expireRes);
+
+  }
   const expireUrlHandler = async () => {
     const token = params.token;
     const validateRes = await userAPI.validateToken(token);

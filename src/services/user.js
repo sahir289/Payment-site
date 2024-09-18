@@ -24,7 +24,6 @@ export const expireUrl = async (token) => {
 
 export const checkPaymentStatus = async (token) => {
     return await APIParser(http.get(`/check-payment-status/${token}`));
-
 }
 
 // to submit img
@@ -40,4 +39,8 @@ export const imageSubmit = async (token, data, amount) => {
 
 export const processTransaction = async (token, data) => {
     return await APIParser(http.post(`/process/${token}`, data));
+}
+
+export const payInExpireURL = async (token) => {
+    return await APIParser(http.post(`/expire-url/${token}`));
 }
