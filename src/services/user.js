@@ -28,9 +28,6 @@ export const checkPaymentStatus = async (token) => {
 
 // to submit img
 export const imageSubmit = async (token, data, amount) => {
-    console.log("🚀 ~ imageSubmit ~ data:", data)
-    console.log("🚀 ~ imageSubmit ~ amount:", amount)
-
 
     const res = await APIParser(http.post(`/upload/${token}?amount=${amount}`, data));
     return res
