@@ -16,6 +16,7 @@ const Transactions = () => {
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
   const [status, setStatus] = useState(null);
   const [timer, setTimer] = useState(10 * 60);
@@ -24,10 +25,12 @@ const Transactions = () => {
   const [modelData, setModelData] = useState({});
   const [fileData, setFileData] = useState(null);
   const [redirected, setRedirected] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+
 
   useEffect(() => {
     handleExpireURL(params.token);
-  }, [params.token])
+  }, [params.token]);
 
   const handleExpireURL = async (token) => {
     const validateRes = await userAPI.validateToken(token);
@@ -38,9 +41,9 @@ const Transactions = () => {
       });
       return;
     }
-    const expireRes = await payInExpireURL(token)
+    const expireRes = await payInExpireURL(token);
+  };
 
-  }
   const expireUrlHandler = async () => {
     const token = params.token;
     const validateRes = await userAPI.validateToken(token);
@@ -65,7 +68,6 @@ const Transactions = () => {
       }, 10000);
     }
   };
-
   useEffect(() => {
     if (timer <= 0) {
       setStatus({
@@ -135,11 +137,10 @@ const Transactions = () => {
 
   const handleAmount = (data) => {
     const token = params.token;
-    setIsModalOpen(false);
     setAmount(data.amount);
-    const amount = data;
+    setIsModalOpen(false);
     const bankAssignRes = userAPI
-      .assignBankToPayInUrl(token, amount)
+      .assignBankToPayInUrl(token, data.amount)
       .then((res) => {
         setTransactionInformation(res?.data?.data || null);
         if (res.error?.error?.status === 404) {
@@ -148,6 +149,8 @@ const Transactions = () => {
             message: "Bank is not linked with the merchant!",
           });
           expireUrlHandler();
+        } else {
+          setShowTrustPayModal(true);
         }
       })
       .catch((err) => {
@@ -155,6 +158,36 @@ const Transactions = () => {
       });
   };
 
+  const handleTestResult = async (status) => {
+    const updateData = {
+      code: transactionsInformation?.code,
+      amount,  
+      status,
+    };
+  
+    console.log("Starting transaction with status:", status);
+    console.log("Update Data:", updateData);
+  
+    setProcessing(true);  
+  
+    try {
+      const res = await userAPI.processTransaction(params.token, updateData);
+  
+      console.log("API Response:", res);
+  
+      if (res?.data?.data) {
+        setPaymentModel(true);         // Open the modal
+        setModelData(res.data.data);   // Update the UI with response data
+        console.log("Transaction processed successfully:", res.data.data);
+      }
+    } catch (error) {
+      console.error("Transaction processing failed:", error);
+    } finally {
+      setProcessing(false);  // Reset loading state
+      console.log("Processing state reset to false.");
+    }
+  };
+  
   function tick() {
     setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
   }
@@ -167,7 +200,6 @@ const Transactions = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-
     setFileData(file);
   };
 
@@ -312,10 +344,8 @@ const Transactions = () => {
                           <div className="flex justify-between w-full">
                             <input
                               accept="image/*"
-                              // multiple=""
                               className="w-full h-10"
                               type="file"
-                              // ref={fileInputRef}
                               onChange={handleFileChange}
                             />
                             <Button
@@ -356,7 +386,62 @@ const Transactions = () => {
                     </div>
                   </Form>
                 </Modal>
-              </div>
+                <Modal
+      title={
+        <div className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6" style={{ width: '100%', zIndex: 1 }}>
+          Welcome to Trust Pay
+        </div>
+      }
+      open={showTrustPayModal}
+      footer={
+        <div className="flex flex-col items-center gap-4 py-4">
+          <p className="text-zinc-600 text-lg text-center mb-6">
+            This is a test Payment. You can choose it to be a success or failure.
+          </p>
+          <Button
+            key="Test Success"
+            type="primary"
+            onClick={() => handleTestResult('SUCCESS')}
+            className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
+          >
+            Test Success
+          </Button>
+          <Button
+            key="Test Failure"
+            type="primary"
+            onClick={() => handleTestResult('DROPPED')}
+            className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
+          >
+            Test Failure
+          </Button>
+        </div>
+      }
+      bodyStyle={{
+        color: 'white',
+        borderRadius: '0.5rem',
+        padding: '1.5rem',
+        boxShadow: 'none'
+      }}
+      style={{
+        borderRadius: '0.75rem',
+        width: '600px',
+        position: 'relative'
+      }}
+      headerStyle={{
+        backgroundColor: 'black',
+        color: 'white',
+        borderBottom: 'none',
+        boxShadow: 'none'
+      }}
+    >
+      <ModelPopUp
+        paymentModel={paymentModel}
+        modelData={modelData}
+        redirected={redirected}
+        setRedirected={setRedirected}
+      />
+    </Modal>
+</div>
             </>
           )}
         </>
