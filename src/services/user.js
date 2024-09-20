@@ -35,6 +35,7 @@ export const imageSubmit = async (token, data, amount) => {
 
 
 export const processTransaction = async (token, data) => {
+    console.log("Token:", token);
     return await APIParser(http.post(`/process/${token}`, data));
 }
 

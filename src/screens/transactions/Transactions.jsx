@@ -26,6 +26,7 @@ const Transactions = () => {
   const [fileData, setFileData] = useState(null);
   const [redirected, setRedirected] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [currentStatus, setCurrentStatus] = useState(null);
 
 
   useEffect(() => {
@@ -160,35 +161,37 @@ const Transactions = () => {
 
   const handleTestResult = async (newStatus) => {
     const updateData = {
-      code: transactionsInformation?.code || "default_code",
-      amount,
-      status: newStatus,  // Use the new status passed to the function
+        code: transactionsInformation?.code || "default_code",
+        amount,
+        status: newStatus,
     };
-  
+
     console.log("Starting transaction with status:", newStatus);
     console.log("Update Data:", updateData);
-  
+    console.log("Token:", params.token);  // Log the token
+
     setProcessing(true);
-  
+
     try {
-      const res = await userAPI.processTransaction(params.token, updateData);
-  
-      console.log("API Response:", res);
-  
-      if (res?.data?.data) {
-        setPaymentModel(true);
-        setModelData(res.data.data);
-        console.log("Transaction processed successfully:", res.data.data);
-        // Optionally update state to reflect the new status
-        // e.g., setCurrentStatus(res.data.data.status);
-      }
+        const res = await userAPI.processTransaction(params.token, updateData);
+        console.log("API Response:", res);
+        
+        if (res?.data?.data) {
+            setPaymentModel(true);
+            setModelData(res.data.data);
+            console.log("Transaction processed successfully:", res.data.data);
+        }
     } catch (error) {
-      console.error("Transaction processing failed:", error);
+        console.error("Transaction processing failed:", error);
     } finally {
-      setProcessing(false);
-      console.log("Processing state reset to false.");
+        setProcessing(false);
+        console.log("Processing state reset to false.");
     }
-  };
+};
+
+
+  
+  
   
   
   function tick() {
