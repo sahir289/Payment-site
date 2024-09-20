@@ -158,17 +158,17 @@ const Transactions = () => {
       });
   };
 
-  const handleTestResult = async (status) => {
+  const handleTestResult = async (newStatus) => {
     const updateData = {
-      code: transactionsInformation?.code,
-      amount,  
-      status,
+      code: transactionsInformation?.code || "default_code",
+      amount,
+      status: newStatus,  // Use the new status passed to the function
     };
   
-    console.log("Starting transaction with status:", status);
+    console.log("Starting transaction with status:", newStatus);
     console.log("Update Data:", updateData);
   
-    setProcessing(true);  
+    setProcessing(true);
   
     try {
       const res = await userAPI.processTransaction(params.token, updateData);
@@ -176,17 +176,20 @@ const Transactions = () => {
       console.log("API Response:", res);
   
       if (res?.data?.data) {
-        setPaymentModel(true);         // Open the modal
-        setModelData(res.data.data);   // Update the UI with response data
+        setPaymentModel(true);
+        setModelData(res.data.data);
         console.log("Transaction processed successfully:", res.data.data);
+        // Optionally update state to reflect the new status
+        // e.g., setCurrentStatus(res.data.data.status);
       }
     } catch (error) {
       console.error("Transaction processing failed:", error);
     } finally {
-      setProcessing(false);  // Reset loading state
+      setProcessing(false);
       console.log("Processing state reset to false.");
     }
   };
+  
   
   function tick() {
     setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
