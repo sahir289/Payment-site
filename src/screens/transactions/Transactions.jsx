@@ -282,14 +282,7 @@ const Transactions = () => {
                               },
                             ]}
                           >
-                            <Input type="text" size="middle" onKeyDown={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                const isControlKey = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab'].includes(e.key);
-                                if (!isControlKey) {
-                                  e.preventDefault();
-                                }
-                              }
-                              }}/>
+                            <Input type="text" size="middle" />
                           </Form.Item>
                           <Form.Item name="" label=" ">
                             <Button
@@ -340,7 +333,7 @@ const Transactions = () => {
                     </Tabs.TabPane>
                   </Tabs>
                 </div>
-                <Modal title="Attention" open={isModalOpen} footer={false} onCancel={() => setIsModalOpen(false)}>
+                <Modal title="Attention" open={isModalOpen} footer={false}>
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
                       <Form.Item
@@ -355,6 +348,7 @@ const Transactions = () => {
                           placeholder="Enter New Amount"
                           size="large"
                           addonAfter="₹"
+                          min={1}
                           onKeyDown={(e) => {
                             if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
                               e.preventDefault();
@@ -365,7 +359,7 @@ const Transactions = () => {
                             if (value <= 0) {
                               e.target.value = "";
                             }
-                          }}
+                          }} 
                         />
                       </Form.Item>
                       <Button type="primary" htmlType="submit">
