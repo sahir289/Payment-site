@@ -333,7 +333,7 @@ const Transactions = () => {
                     </Tabs.TabPane>
                   </Tabs>
                 </div>
-                <Modal title="Attention" open={isModalOpen} footer={false}>
+                <Modal title="Attention" open={isModalOpen} footer={false} onCancel={() => setIsModalOpen(false)}>
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
                       <Form.Item
