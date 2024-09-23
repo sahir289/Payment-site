@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button, message } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button } from "antd";
 import { FcRating } from "react-icons/fc";
-import { Upi, Bank, Result } from "../../components";
-import { useNavigate, useParams } from "react-router-dom";
+import { Upi, Bank } from "../../components";
+import { useParams } from "react-router-dom";
 import { userAPI } from "../../services";
 import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
@@ -13,6 +13,7 @@ import { payInExpireURL } from "../../services/user";
 const Transactions = () => {
   const params = useParams();
   const [loading, setLoading] = useState(true);
+  const [amountLoading, setAmountLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,8 +23,9 @@ const Transactions = () => {
   const [expireTime, setExpireTime] = useState(10000000000);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});
-  const [fileData, setFileData] = useState(null);
   const [redirected, setRedirected] = useState(false);
+  const isQr = !transactionsInformation || transactionsInformation.is_qr;
+  const isBank = !transactionsInformation || transactionsInformation.is_bank;
 
   useEffect(() => {
     handleExpireURL(params.token);
@@ -38,8 +40,7 @@ const Transactions = () => {
       });
       return;
     }
-    const expireRes = await payInExpireURL(token)
-
+    await payInExpireURL(token)
   }
   const expireUrlHandler = async () => {
     const token = params.token;
@@ -133,26 +134,31 @@ const Transactions = () => {
     }
   };
 
-  const handleAmount = (data) => {
+  const handleAmount = async (data) => {
     const token = params.token;
-    setIsModalOpen(false);
     setAmount(data.amount);
     const amount = data;
-    const bankAssignRes = userAPI
-      .assignBankToPayInUrl(token, amount)
-      .then((res) => {
-        setTransactionInformation(res?.data?.data || null);
-        if (res.error?.error?.status === 404) {
-          setStatus({
-            status: "404",
-            message: "Bank is not linked with the merchant!",
-          });
-          expireUrlHandler();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+    setAmountLoading(true);
+    const res = await userAPI.assignBankToPayInUrl(token, amount);
+    setAmountLoading(false);
+    if (res.error?.error?.status === 404) {
+      setStatus({
+        status: "404",
+        message: "Bank is not linked with the merchant!",
       });
+      expireUrlHandler();
+      return;
+    }
+    const bankData = res?.data?.data || null;
+    setTransactionInformation(bankData);
+    if(!bankData.is_bank && !bankData.is_qr){
+      setStatus({
+        status: "404",
+        message: "No payment methods are available!",
+      });
+      return;
+    }
+    setIsModalOpen(false);
   };
 
   function tick() {
@@ -165,30 +171,22 @@ const Transactions = () => {
     return `${minutes}:${seconds}`;
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-
-    setFileData(file);
-  };
-
-  const handleImgSubmit = async () => {
+  const handleImgSubmit = async (data) => {
     const token = params.token;
-    if (fileData !== undefined || fileData !== null) {
-      const formData = new FormData();
-      formData.append("file", fileData);
-      const amountData = amount;
-      setProcessing(true);
-      const imgSubmitRes = await userAPI
-        .imageSubmit(token, formData, amount)
-        .then((res) => {
-          setPaymentModel(true);
-          setModelData(res?.data?.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      setProcessing(false);
+    const fileData = data.img[0];
+    if (!fileData) {
+      return;
     }
+    const formData = new FormData();
+    formData.append("file", fileData);
+    setProcessing(true);
+    const res = await userAPI.imageSubmit(token, formData, amount);
+    if(res.error){
+      return;
+    }
+    setPaymentModel(true);
+    setModelData(res?.data?.data);
+    setProcessing(false);
   };
 
   const formattedTime = formatTime(timer);
@@ -234,6 +232,8 @@ const Transactions = () => {
                     tabBarGutter={5}
                     style={{ marginTop: "-10px" }}
                   >
+                  {
+                    isQr &&
                     <Tabs.TabPane tab="UPI" key="1">
                       <Upi
                         {...transactionsInformation}
@@ -241,6 +241,9 @@ const Transactions = () => {
                         formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
+                  }
+                  {
+                    isBank &&
                     <Tabs.TabPane tab="Bank Transfer" key="3">
                       <Bank
                         {...transactionsInformation}
@@ -248,16 +251,17 @@ const Transactions = () => {
                         formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
+                  }
                   </Tabs>
+
 
                   <Tabs defaultActiveKey="1" className="bottom-tabs" type="card">
                     <Tabs.TabPane tab="Enter UTR" key="1">
                       <Form
                         layout="vertical"
                         onFinish={handleUtrNumber}
-                        style={{ marginTop: "-24px" }}
+                        className="utr-number pt-[30px] mt-[-24px]"
                       >
-                        <div className="utr-number pt-[30px]">
                           <Form.Item
                             label={
                               <span>
@@ -295,45 +299,48 @@ const Transactions = () => {
                               Submit
                             </Button>
                           </Form.Item>
-                        </div>
                       </Form>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Upload ScreenShot" key="2">
                       <Form
                         layout="vertical"
                         onFinish={handleImgSubmit}
-                        className="m-0 p-0"
+                        className="utr-number mt-[6px]"
                       >
                         <Form.Item
-                          label={<span className="">Add the Image here</span>}
-                          className=" ps-6 w-full"
-                          style={{ backgroundColor: "#f7f7f7" }}
+                          name="img"
+                          label="Add the Image here"
+                          valuePropName="files"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please upload image first",
+                            }
+                          ]}
                         >
-                          <div className="flex justify-between w-full">
-                            <input
+                            <Input
                               accept="image/*"
-                              // multiple=""
-                              className="w-full h-10"
                               type="file"
-                              // ref={fileInputRef}
-                              onChange={handleFileChange}
+                              size="middle"
+                              className="h-[32px] py-0 pt-[1px]"
                             />
+                        </Form.Item>
+                        <Form.Item name="" label=" ">
                             <Button
                               type="primary"
-                              size="middle"
                               htmlType="submit"
                               loading={processing}
-                              className="pe-5 mr-2 w-[132px]"
+                              className="ml-1"
+                              size="middle"
                             >
                               Submit
                             </Button>
-                          </div>
                         </Form.Item>
                       </Form>
                     </Tabs.TabPane>
                   </Tabs>
                 </div>
-                <Modal title="Attention" open={isModalOpen} footer={false} onCancel={() => setIsModalOpen(false)}>
+                <Modal title="Attention" open={isModalOpen} footer={false} closable={false}>
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
                       <Form.Item
@@ -362,7 +369,7 @@ const Transactions = () => {
                           }} 
                         />
                       </Form.Item>
-                      <Button type="primary" htmlType="submit">
+                      <Button type="primary" htmlType="submit" loading={amountLoading}>
                         Submit
                       </Button>
                     </div>
