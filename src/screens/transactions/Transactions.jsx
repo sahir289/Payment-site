@@ -333,7 +333,7 @@ const Transactions = () => {
                     </Tabs.TabPane>
                   </Tabs>
                 </div>
-                <Modal title="Attention" open={isModalOpen} footer={false}>
+                <Modal title="Attention" open={isModalOpen} footer={false} onCancel={() => setIsModalOpen(false)}>
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
                       <Form.Item
@@ -348,6 +348,18 @@ const Transactions = () => {
                           placeholder="Enter New Amount"
                           size="large"
                           addonAfter="₹"
+                          min={1}
+                          onKeyDown={(e) => {
+                            if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
+                              e.preventDefault();
+                            }
+                          }}
+                          onBlur={(e) => {
+                            const value = parseFloat(e.target.value);
+                            if (value <= 0) {
+                              e.target.value = "";
+                            }
+                          }} 
                         />
                       </Form.Item>
                       <Button type="primary" htmlType="submit">
