@@ -50,6 +50,7 @@ const Transactions = () => {
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
+    // res.data.data.amount = 5000000;
     if (res?.data?.data?.status === "Success") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
@@ -63,6 +64,16 @@ const Transactions = () => {
           message: "Url is Already expired!",
         });
       }, 10000);
+    }
+    if (res?.data?.data?.amount !== 0) {
+      setIsModalOpen(false);
+      const data = {
+        amount: res?.data?.data?.amount,
+      }
+      handleAmount(data);
+    }
+    else {
+      setIsModalOpen(true);
     }
   };
 
@@ -113,7 +124,7 @@ const Transactions = () => {
       }
     }
     setExpireTime(data?.expiryTime);
-    setIsModalOpen(true);
+    // setIsModalOpen(true);
   };
 
   const handleUtrNumber = async (data) => {
