@@ -3,7 +3,7 @@ name: Payment Site
 on:
   push:
     branches:
-      - main
+      - staging-paymentsite
 
 jobs:
   build-deploy:
