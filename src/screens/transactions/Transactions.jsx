@@ -409,7 +409,7 @@ const Transactions = () => {
                         />
                       </Form.Item>
                       <Button type="primary" htmlType="submit" loading={amountLoading}>
-                        SUBMIT
+                        Submit
                       </Button>
                     </div>
                   </Form>
