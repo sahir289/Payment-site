@@ -160,6 +160,8 @@ const Transactions = () => {
       });
       expireUrlHandler();
       return;
+    } else {
+      setShowTrustPayModal(true);
     }
     const bankData = res?.data?.data || null;
     setTransactionInformation(bankData);
@@ -211,7 +213,7 @@ const Transactions = () => {
     setProcessing(true);
     const testResultRes = userAPI.testResult(token, { ...apiData  });
     setProcessing(false);
-    if (testResultRes?.status === 200) {
+    if (testResultRes) {
       setStatus({
         status: "200",
         message: "UPI Test Successful",
