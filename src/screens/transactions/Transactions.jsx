@@ -216,7 +216,7 @@ const Transactions = () => {
     if (testResultRes) {
       setStatus({
         status: "200",
-        message: "UPI Test Successful",
+        message: "Test Applied",
       });
     }
   };
