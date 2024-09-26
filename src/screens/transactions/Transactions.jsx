@@ -26,7 +26,6 @@ const Transactions = () => {
   const [redirected, setRedirected] = useState(false);
   const isQr = !transactionsInformation || transactionsInformation.is_qr;
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
-  const [showTrustPayModal, setShowTrustPayModal] = useState(false);
 
   useEffect(() => {
     handleExpireURL(params.token);
@@ -52,7 +51,6 @@ const Transactions = () => {
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
-    // res.data.data.amount = 5000000;
     if (res?.data?.data?.status === "Success") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
@@ -66,16 +64,6 @@ const Transactions = () => {
           message: "Url is Already expired!",
         });
       }, 10000);
-    }
-    if (res?.data?.data?.amount !== 0) {
-      setIsModalOpen(false);
-      const data = {
-        amount: res?.data?.data?.amount,
-      }
-      handleAmount(data);
-    }
-    else {
-      setIsModalOpen(true);
     }
   };
 
@@ -126,7 +114,7 @@ const Transactions = () => {
       }
     }
     setExpireTime(data?.expiryTime);
-    // setIsModalOpen(true);
+    setIsModalOpen(true);
   };
 
   const handleUtrNumber = async (data) => {
@@ -160,8 +148,6 @@ const Transactions = () => {
       });
       expireUrlHandler();
       return;
-    } else {
-      setShowTrustPayModal(true);
     }
     const bankData = res?.data?.data || null;
     setTransactionInformation(bankData);
@@ -204,22 +190,6 @@ const Transactions = () => {
   };
 
   const formattedTime = formatTime(timer);
-
-  const handleTestResult = (data) => {
-    const apiData = {
-      status : data,
-    };
-    const token = params.token;
-    setProcessing(true);
-    const testResultRes = userAPI.testResult(token, { ...apiData  });
-    setProcessing(false);
-    if (testResultRes) {
-      setStatus({
-        status: "200",
-        message: "UPI Test Successful",
-      });
-    }
-  };
 
   return (
     <>
@@ -405,7 +375,7 @@ const Transactions = () => {
                             if (value <= 0) {
                               e.target.value = "";
                             }
-                          }}
+                          }} 
                         />
                       </Form.Item>
                       <Button type="primary" htmlType="submit" loading={amountLoading}>
@@ -413,55 +383,6 @@ const Transactions = () => {
                       </Button>
                     </div>
                   </Form>
-                </Modal>
-                <Modal
-                  title={
-                    <div className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6" style={{ width: '100%', zIndex: 1 }}>
-                      Welcome to Trust Pay
-                    </div>
-                  }
-                  open={showTrustPayModal}
-                  footer={
-                    <div className="flex flex-col items-center gap-4 py-4">
-                      <p className="text-zinc-600 text-lg text-center mb-6">
-                        This is a test Payment. You can choose it to be a success or failure.
-                      </p>
-                      <Button
-                        key="Test Success"
-                        type="primary"
-                        onClick={() => handleTestResult('SUCCESS')}
-                        className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
-                      >
-                        Test Success
-                      </Button>
-                      <Button
-                        key="Test Failure"
-                        type="primary"
-                        onClick={() => handleTestResult('DROPPED')}
-                        className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
-                      >
-                        Test Failure
-                      </Button>
-                    </div>
-                  }
-                  bodyStyle={{
-                    color: 'white',
-                    borderRadius: '0.5rem',
-                    padding: '1.5rem',
-                    boxShadow: 'none'
-                  }}
-                  style={{
-                    borderRadius: '0.75rem',
-                    width: '600px',
-                    position: 'relative' 
-                  }}
-                  headerStyle={{
-                    backgroundColor: 'black',
-                    color: 'white',
-                    borderBottom: 'none',
-                    boxShadow: 'none'
-                  }}
-                >
                 </Modal>
               </div>
             </>
