@@ -26,10 +26,6 @@ export const checkPaymentStatus = async (token) => {
     return await APIParser(http.get(`/check-payment-status/${token}`));
 }
 
-export const testResult = async (token, data) => {
-    return await APIParser(http.post(`/update-payment-status/${token}`,data));
-}
-
 // to submit img
 export const imageSubmit = async (token, data, amount) => {
 
