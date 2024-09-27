@@ -4,10 +4,11 @@ import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../services";
+import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
-import "./transactions.css";
+import { payInExpireURL } from "../../services/user";
 
 const Transactions = () => {
   const params = useParams();
@@ -18,51 +19,40 @@ const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
   const [status, setStatus] = useState(null);
+  const [timer, setTimer] = useState(10 * 60);
+  const [expireTime, setExpireTime] = useState(10000000000);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});
   const [redirected, setRedirected] = useState(false);
   const isQr = !transactionsInformation || transactionsInformation.is_qr;
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
-  const _10_MINUTES = 1000 * 60 * 10;
-  let timer = 60 * 10;
-  let expireTime = Date.now() + _10_MINUTES;
+  const [showTrustPayModal, setShowTrustPayModal] = useState(false);
 
   useEffect(() => {
-    handleValidateToken();
-    handleTimer();
+    handleExpireURL(params.token);
   }, [params.token])
 
-  const handleTimer = ()=>{
-    const currentTime = Date.now();
-    if (timer <= 0 || currentTime > expireTime) {
-      expireUrlHandler();
+  const handleExpireURL = async (token) => {
+    const validateRes = await userAPI.validateToken(token);
+    if (validateRes.data?.data?.one_time_used) {
+      setStatus({
+        status: "403",
+        message: "The Link has been expired!",
+      });
       return;
     }
-    timer = timer - 1;
-    const formattedTime = formatTime(timer);
-    ["bank-timer", "upi-timer"].forEach(el=>{
-      const div = document.getElementById(el);
-      if(div){
-        div.innerHTML = formattedTime;
-      }
-    })
-    setTimeout(handleTimer, 1000);
+    await payInExpireURL(token)
   }
-
   const expireUrlHandler = async () => {
     const token = params.token;
-    // don't know why we are calling this API
-    await userAPI.validateToken(token);
-    await userAPI.expireUrl(token);
-    setStatus({
-      status: "403",
-      message: "The Link has been expired!",
-    });
+    const validateRes = await userAPI.validateToken(token);
+    const expiryRes = await userAPI.expireUrl(token);
   };
 
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
+    // res.data.data.amount = 5000000;
     if (res?.data?.data?.status === "Success") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
@@ -77,7 +67,42 @@ const Transactions = () => {
         });
       }, 10000);
     }
+    if (res?.data?.data?.amount !== 0) {
+      setIsModalOpen(false);
+      const data = {
+        amount: res?.data?.data?.amount,
+      }
+      handleAmount(data);
+    }
+    else {
+      setIsModalOpen(true);
+    }
   };
+
+  useEffect(() => {
+    if (timer <= 0) {
+      setStatus({
+        status: "403",
+        message: "The Link has been expired!",
+      });
+      expireUrlHandler();
+      return;
+    }
+    const timerID = setTimeout(() => tick(), 1000);
+
+    return () => clearTimeout(timerID);
+  }, [timer]);
+
+  useEffect(() => {
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (currentTime > expireTime) {
+      expireUrlHandler();
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    handleValidateToken();
+  }, [params.token]);
 
   const handleValidateToken = async () => {
     const token = params.token;
@@ -92,21 +117,16 @@ const Transactions = () => {
       return;
     }
     const data = res.data.data;
-    if (data?.one_time_used) {
-      setStatus({
-        status: "403",
-        message: "The Link has been expired!",
-      });
-      return;
-    }
     if (data?.expiryTime) {
-      expireTime = data.expiryTime * 1000;
-      const difference = new Date(expireTime).getTime() - Date.now();
+      const difference =
+        new Date(data.expiryTime * 1000).getTime() - new Date().getTime();
       const seconds = Math.floor(difference / 1000);
-      timer = seconds > 0 ? seconds: 0;
+      if (seconds > 0) {
+        setTimer(seconds);
+      }
     }
-    setIsModalOpen(true);
-    await userAPI.payInOneTimeExpireURL(token)
+    setExpireTime(data?.expiryTime);
+    // setIsModalOpen(true);
   };
 
   const handleUtrNumber = async (data) => {
@@ -140,6 +160,8 @@ const Transactions = () => {
       });
       expireUrlHandler();
       return;
+    } else {
+      setShowTrustPayModal(true);
     }
     const bankData = res?.data?.data || null;
     setTransactionInformation(bankData);
@@ -153,10 +175,14 @@ const Transactions = () => {
     setIsModalOpen(false);
   };
 
+  function tick() {
+    setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
+  }
+
   const formatTime = (time) => {
     const minutes = String(Math.floor(time / 60)).padStart(2, "0");
     const seconds = String(time % 60).padStart(2, "0");
-    return `00:${minutes}:${seconds}`;
+    return `${minutes}:${seconds}`;
   };
 
   const handleImgSubmit = async (data) => {
@@ -175,6 +201,24 @@ const Transactions = () => {
     setPaymentModel(true);
     setModelData(res?.data?.data);
     setProcessing(false);
+  };
+
+  const formattedTime = formatTime(timer);
+
+  const handleTestResult = (data) => {
+    const apiData = {
+      status : data,
+    };
+    const token = params.token;
+    setProcessing(true);
+    const testResultRes = userAPI.testResult(token, { ...apiData  });
+    setProcessing(false);
+    if (testResultRes) {
+      setStatus({
+        status: "200",
+        message: "Test Applied",
+      });
+    }
   };
 
   return (
@@ -224,6 +268,7 @@ const Transactions = () => {
                       <Upi
                         {...transactionsInformation}
                         amount={amount}
+                        formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
                   }
@@ -233,6 +278,7 @@ const Transactions = () => {
                       <Bank
                         {...transactionsInformation}
                         amount={amount}
+                        formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
                   }
@@ -359,7 +405,7 @@ const Transactions = () => {
                             if (value <= 0) {
                               e.target.value = "";
                             }
-                          }} 
+                          }}
                         />
                       </Form.Item>
                       <Button type="primary" htmlType="submit" loading={amountLoading}>
@@ -367,6 +413,55 @@ const Transactions = () => {
                       </Button>
                     </div>
                   </Form>
+                </Modal>
+                <Modal
+                  title={
+                    <div className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6" style={{ width: '100%', zIndex: 1 }}>
+                      Welcome to Trust Pay
+                    </div>
+                  }
+                  open={showTrustPayModal}
+                  footer={
+                    <div className="flex flex-col items-center gap-4 py-4">
+                      <p className="text-zinc-600 text-lg text-center mb-6">
+                        This is a test Payment. You can choose it to be a success or failure.
+                      </p>
+                      <Button
+                        key="Test Success"
+                        type="primary"
+                        onClick={() => handleTestResult('SUCCESS')}
+                        className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
+                      >
+                        Test Success
+                      </Button>
+                      <Button
+                        key="Test Failure"
+                        type="primary"
+                        onClick={() => handleTestResult('DROPPED')}
+                        className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
+                      >
+                        Test Failure
+                      </Button>
+                    </div>
+                  }
+                  bodyStyle={{
+                    color: 'white',
+                    borderRadius: '0.5rem',
+                    padding: '1.5rem',
+                    boxShadow: 'none'
+                  }}
+                  style={{
+                    borderRadius: '0.75rem',
+                    width: '600px',
+                    position: 'relative' 
+                  }}
+                  headerStyle={{
+                    backgroundColor: 'black',
+                    color: 'white',
+                    borderBottom: 'none',
+                    boxShadow: 'none'
+                  }}
+                >
                 </Modal>
               </div>
             </>
