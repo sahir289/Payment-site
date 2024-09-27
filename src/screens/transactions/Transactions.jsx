@@ -8,10 +8,12 @@ import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
+import { useLocation } from 'react-router-dom';
 
 
 const Transactions = () => {
   const params = useParams();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [amountLoading, setAmountLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -27,6 +29,9 @@ const Transactions = () => {
   const isQr = !transactionsInformation || transactionsInformation.is_qr;
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
+
+  const queryParams = new URLSearchParams(location.search);
+  const isTestMode = queryParams.get('t');
 
   useEffect(() => {
     handleExpireURL(params.token);
@@ -161,7 +166,7 @@ const Transactions = () => {
       expireUrlHandler();
       return;
     } else {
-      setShowTrustPayModal(true);
+      isTestMode && setShowTrustPayModal(true);
     }
     const bankData = res?.data?.data || null;
     setTransactionInformation(bankData);
@@ -414,7 +419,7 @@ const Transactions = () => {
                     </div>
                   </Form>
                 </Modal>
-                <Modal
+                {isTestMode && <Modal
                   title={
                     <div className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6" style={{ width: '100%', zIndex: 1 }}>
                       Welcome to Trust Pay
@@ -429,7 +434,7 @@ const Transactions = () => {
                       <Button
                         key="Test Success"
                         type="primary"
-                        onClick={() => handleTestResult('SUCCESS')}
+                        onClick={() => handleTestResult('TEST_SUCCESS')}
                         className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
                       >
                         Test Success
@@ -437,7 +442,7 @@ const Transactions = () => {
                       <Button
                         key="Test Failure"
                         type="primary"
-                        onClick={() => handleTestResult('DROPPED')}
+                        onClick={() => handleTestResult('TEST_DROPPED')}
                         className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
                       >
                         Test Failure
@@ -462,7 +467,7 @@ const Transactions = () => {
                     boxShadow: 'none'
                   }}
                 >
-                </Modal>
+                </Modal>}
               </div>
             </>
           )}
