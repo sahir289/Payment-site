@@ -8,7 +8,7 @@ import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
-import { payInExpireURL } from "../../services/user";
+
 
 const Transactions = () => {
   const params = useParams();
