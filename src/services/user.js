@@ -38,6 +38,6 @@ export const processTransaction = async (token, data) => {
     return await APIParser(http.post(`/process/${token}`, data));
 }
 
-export const payInExpireURL = async (token) => {
-    return await APIParser(http.post(`/expire-url/${token}`));
+export const payInOneTimeExpireURL = async (token) => {
+    return await APIParser(http.post(`/expire-one-time-payin-url/${token}`));
 }

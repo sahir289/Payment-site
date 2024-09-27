@@ -5,7 +5,7 @@ import { RiFileCopyFill } from "react-icons/ri";
 import { copyToClipboard } from '../../utils';
 import "./Bank.css"
 
-const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount, formattedTime }) => {
+const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount }) => {
 
 
   return (
@@ -14,7 +14,7 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount, formattedTime }) => {
         <p className='text'>Payment Time Left</p>
         <div className="right-area">
           <MdOutlineTimer size={20} color='white' />
-          <p className='timer-text'>00:{formattedTime}</p>
+          <p className='timer-text' id='bank-timer'>00:10:00</p>
         </div>
       </div>
       <div className="section-container">

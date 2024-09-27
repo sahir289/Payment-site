@@ -6,14 +6,14 @@ import { QrGenerator } from '../qr-generator'
 import { copyToClipboard } from '../../utils';
 import "./Upi.css";
 
-const Upi = ({ code, amount, upi_id,formattedTime,ac_name }) => {
+const Upi = ({ code, amount, upi_id,ac_name }) => {
   return (
     <section className='upi-section' >
       <div className="bank-container" >
         <p className='text'>Payment Time Left</p>
         <div className="right-area">
           <MdOutlineTimer size={20} color='white' />
-          <p className='timer-text'>00:{formattedTime}</p>
+          <p className='timer-text' id='upi-timer'>00:10:00</p>
         </div>
       </div>
       <div className="section-container">
