@@ -77,7 +77,7 @@ const Transactions = () => {
       const data = {
         amount: res?.data?.data?.amount,
       }
-      handleAmount(data);
+      // handleAmount(data);
     }
     else {
       setIsModalOpen(true);
