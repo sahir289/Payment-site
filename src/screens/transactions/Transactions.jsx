@@ -4,11 +4,11 @@ import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../services";
-import "./transactions.css";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
 import { useLocation } from 'react-router-dom';
+import "./transactions.css";
 
 
 const Transactions = () => {
@@ -21,37 +21,59 @@ const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
   const [status, setStatus] = useState(null);
-  const [timer, setTimer] = useState(10 * 60);
-  const [expireTime, setExpireTime] = useState(10000000000);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});
   const [redirected, setRedirected] = useState(false);
   const isQr = !transactionsInformation || transactionsInformation.is_qr;
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
-
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get('t');
+  const _10_MINUTES = 1000 * 60 * 10;
+  let timer = 60 * 10;
+  let expireTime = Date.now() + _10_MINUTES;
+
+  useEffect(()=>{
+    // listener for tab or window focus
+    document.addEventListener('visibilitychange', setTimerSeconds);
+    document.addEventListener("focus", setTimerSeconds);
+    
+    return ()=>{
+      document.removeEventListener('visibilitychange', setTimerSeconds);
+      document.removeEventListener("focus", setTimerSeconds);
+    }
+  }, []);
 
   useEffect(() => {
-    handleExpireURL(params.token);
+    handleValidateToken();
+    handleTimer();
   }, [params.token])
 
-  const handleExpireURL = async (token) => {
-    const validateRes = await userAPI.validateToken(token);
-    if (validateRes.data?.data?.one_time_used) {
-      setStatus({
-        status: "403",
-        message: "The Link has been expired!",
-      });
+  const handleTimer = ()=>{
+    const currentTime = Date.now();
+    if (timer <= 0 || currentTime > expireTime) {
+      expireUrlHandler();
       return;
     }
-    await payInExpireURL(token)
+    timer = timer - 1;
+    const formattedTime = formatTime(timer);
+    ["bank-timer", "upi-timer"].forEach(el=>{
+      const div = document.getElementById(el);
+      if(div){
+        div.innerHTML = formattedTime;
+      }
+    })
+    setTimeout(handleTimer, 1000);
   }
   const expireUrlHandler = async () => {
     const token = params.token;
-    const validateRes = await userAPI.validateToken(token);
-    const expiryRes = await userAPI.expireUrl(token);
+    // don't know why we are calling this API
+    await userAPI.validateToken(token);
+    await userAPI.expireUrl(token);
+    setStatus({
+      status: "403",
+      message: "The Link has been expired!",
+    });
   };
 
   const checkPaymentStatusHandler = async () => {
@@ -85,31 +107,6 @@ const Transactions = () => {
     setIsModalOpen(true);
   };
 
-  useEffect(() => {
-    if (timer <= 0) {
-      setStatus({
-        status: "403",
-        message: "The Link has been expired!",
-      });
-      expireUrlHandler();
-      return;
-    }
-    const timerID = setTimeout(() => tick(), 1000);
-
-    return () => clearTimeout(timerID);
-  }, [timer]);
-
-  useEffect(() => {
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (currentTime > expireTime) {
-      expireUrlHandler();
-    }
-  }, [timer]);
-
-  useEffect(() => {
-    handleValidateToken();
-  }, [params.token]);
-
   const handleValidateToken = async () => {
     const token = params.token;
     setLoading(true);
@@ -123,16 +120,18 @@ const Transactions = () => {
       return;
     }
     const data = res.data.data;
-    if (data?.expiryTime) {
-      const difference =
-        new Date(data.expiryTime * 1000).getTime() - new Date().getTime();
-      const seconds = Math.floor(difference / 1000);
-      if (seconds > 0) {
-        setTimer(seconds);
-      }
+    if (data?.one_time_used) {
+      setStatus({
+        status: "403",
+        message: "The Link has been expired!",
+      });
+      return;
     }
-    setExpireTime(data?.expiryTime);
-    // setIsModalOpen(true);
+    if (data?.expiryTime) {
+      expireTime = data.expiryTime * 1000;
+      setTimerSeconds();
+    }
+    await userAPI.payInOneTimeExpireURL(token)
   };
 
   const handleUtrNumber = async (data) => {
@@ -181,10 +180,6 @@ const Transactions = () => {
     setIsModalOpen(false);
   };
 
-  function tick() {
-    setTimer((prevTimer) => (prevTimer > 0 ? prevTimer - 1 : 0));
-  }
-
   const formatTime = (time) => {
     const minutes = String(Math.floor(time / 60)).padStart(2, "0");
     const seconds = String(time % 60).padStart(2, "0");
@@ -209,8 +204,6 @@ const Transactions = () => {
     setProcessing(false);
   };
 
-  const formattedTime = formatTime(timer);
-
   const handleTestResult = (data) => {
     const apiData = {
       status : data,
@@ -226,6 +219,12 @@ const Transactions = () => {
       });
     }
   };
+
+  const setTimerSeconds = ()=>{
+    const difference = new Date(expireTime).getTime() - Date.now();
+    const seconds = Math.floor(difference / 1000);
+    timer = seconds > 0 ? seconds: 0;
+  }
 
   return (
     <>
@@ -274,7 +273,6 @@ const Transactions = () => {
                       <Upi
                         {...transactionsInformation}
                         amount={amount}
-                        formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
                   }
@@ -284,7 +282,6 @@ const Transactions = () => {
                       <Bank
                         {...transactionsInformation}
                         amount={amount}
-                        formattedTime={formattedTime}
                       />
                     </Tabs.TabPane>
                   }
