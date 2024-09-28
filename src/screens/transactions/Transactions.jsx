@@ -72,16 +72,17 @@ const Transactions = () => {
         });
       }, 10000);
     }
-    if (res?.data?.data?.amount !== 0) {
-      setIsModalOpen(false);
-      const data = {
-        amount: res?.data?.data?.amount,
-      }
-      // handleAmount(data);
-    }
-    else {
-      setIsModalOpen(true);
-    }
+    // if (res?.data?.data?.amount !== 0) {
+    //   setIsModalOpen(false);
+    //   const data = {
+    //     amount: res?.data?.data?.amount,
+    //   }
+    //   // handleAmount(data);
+    // }
+    // else {
+    //   setIsModalOpen(true);
+    // }
+    setIsModalOpen(true);
   };
 
   useEffect(() => {
