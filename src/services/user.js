@@ -33,6 +33,10 @@ export const imageSubmit = async (token, data, amount) => {
     return res
 }
 
+export const testResult = async (token, data) => {
+    return await APIParser(http.post(`/update-payment-status/${token}`,data));
+}
+
 
 export const processTransaction = async (token, data) => {
     return await APIParser(http.post(`/process/${token}`, data));
