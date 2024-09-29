@@ -321,14 +321,6 @@ const Transactions = () => {
                             ]}
                           >
                             <Input type="text" size="middle" maxLength={12}
-                            onKeyDown={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                const isControlKey = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab'].includes(e.key);
-                                if (!isControlKey) {
-                                  e.preventDefault();
-                                }
-                              }
-                            }}
                              />
                           </Form.Item>
                           <Form.Item name="" label=" ">
