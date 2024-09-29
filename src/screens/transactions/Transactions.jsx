@@ -105,7 +105,6 @@ const Transactions = () => {
     // else {
     //   setIsModalOpen(true);
     // }
-    setIsModalOpen(true);
   };
 
   const handleValidateToken = async () => {
@@ -128,11 +127,16 @@ const Transactions = () => {
       });
       return;
     }
+    userAPI.payInOneTimeExpireURL(token)
     if (data?.expiryTime) {
       expireTime = data.expiryTime * 1000;
       setTimerSeconds();
     }
-    await userAPI.payInOneTimeExpireURL(token)
+    if(Number(data?.amount) > 0){
+      handleAmount(data);
+      return;
+    }
+    setIsModalOpen(true);
   };
 
   const handleUtrNumber = async (data) => {
