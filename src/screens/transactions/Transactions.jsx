@@ -152,7 +152,7 @@ const Transactions = () => {
     setProcessing(false);
     if (res?.data?.data) {
       setPaymentModel(true);
-      setModelData(res?.data?.data);
+      setModelData({ ...res?.data?.data, utr: data.utrNumber });
     }
   };
 
