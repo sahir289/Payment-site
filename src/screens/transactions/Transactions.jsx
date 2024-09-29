@@ -94,6 +94,7 @@ const Transactions = () => {
         });
       }, 10000);
     }
+    // check this
     // if (res?.data?.data?.amount !== 0) {
     //   setIsModalOpen(false);
     //   const data = {
