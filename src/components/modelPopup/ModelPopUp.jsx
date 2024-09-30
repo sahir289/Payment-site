@@ -51,7 +51,7 @@ const ModelPopUp = (props) => {
                 </div>
                 <div className='flex justify-between mt-6'>
                     <p className='text-xl  '>UTR No.</p>
-                    <p className='text-xl  font-bold '>{modelData?.status === "Success" ? modelData?.utr : "--"}</p>
+                    <p className='text-xl  font-bold '>{modelData?.utr ? modelData?.utr : "--"}</p>
                 </div>
                 <div className='flex justify-between  mt-6'>
                     <p className='text-xl  '>Transaction Id.</p>
