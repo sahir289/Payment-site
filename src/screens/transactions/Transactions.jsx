@@ -7,15 +7,18 @@ import { userAPI } from "../../services";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
 import WebSockets from "../../components/webSockets/WebSockets";
 import { ErrorImg } from "../../utils/constants";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import "./transactions.css";
-
+import pcicertificate from "../assets/pcicertificate.jpg";
+import norton from "../assets/norton.jpg";
 
 const Transactions = () => {
   const params = useParams();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [amountLoading, setAmountLoading] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,28 +31,30 @@ const Transactions = () => {
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
-  const isTestMode = queryParams.get('t');
+  const isTestMode = queryParams.get("t");
+  const videoUrl = "https://www.youtube.com/embed/ZqoSbktPThs";
+
   const _10_MINUTES = 1000 * 60 * 10;
   let timer = 60 * 10;
   let expireTime = Date.now() + _10_MINUTES;
 
-  useEffect(()=>{
+  useEffect(() => {
     // listener for tab or window focus
-    document.addEventListener('visibilitychange', setTimerSeconds);
+    document.addEventListener("visibilitychange", setTimerSeconds);
     document.addEventListener("focus", setTimerSeconds);
-    
-    return ()=>{
-      document.removeEventListener('visibilitychange', setTimerSeconds);
+
+    return () => {
+      document.removeEventListener("visibilitychange", setTimerSeconds);
       document.removeEventListener("focus", setTimerSeconds);
-    }
+    };
   }, []);
 
   useEffect(() => {
     handleValidateToken();
     handleTimer();
-  }, [params.token])
+  }, [params.token]);
 
-  const handleTimer = ()=>{
+  const handleTimer = () => {
     const currentTime = Date.now();
     if (timer <= 0 || currentTime > expireTime) {
       expireUrlHandler();
@@ -57,14 +62,14 @@ const Transactions = () => {
     }
     timer = timer - 1;
     const formattedTime = formatTime(timer);
-    ["bank-timer", "upi-timer"].forEach(el=>{
+    ["bank-timer", "upi-timer"].forEach((el) => {
       const div = document.getElementById(el);
-      if(div){
+      if (div) {
         div.innerHTML = formattedTime;
       }
-    })
+    });
     setTimeout(handleTimer, 1000);
-  }
+  };
   const expireUrlHandler = async () => {
     const token = params.token;
     // don't know why we are calling this API
@@ -74,6 +79,9 @@ const Transactions = () => {
       status: "403",
       message: "The Link has been expired!",
     });
+  };
+  const handleVideoSelect = (url) => {
+    videoUrl(url);
   };
 
   const checkPaymentStatusHandler = async () => {
@@ -132,7 +140,7 @@ const Transactions = () => {
       expireTime = data.expiryTime * 1000;
       setTimerSeconds();
     }
-    await userAPI.payInOneTimeExpireURL(token)
+    await userAPI.payInOneTimeExpireURL(token);
   };
 
   const handleUtrNumber = async (data) => {
@@ -171,7 +179,7 @@ const Transactions = () => {
     }
     const bankData = res?.data?.data || null;
     setTransactionInformation(bankData);
-    if(!bankData.is_bank && !bankData.is_qr){
+    if (!bankData.is_bank && !bankData.is_qr) {
       setStatus({
         status: "404",
         message: "No payment methods are available!",
@@ -197,7 +205,7 @@ const Transactions = () => {
     formData.append("file", fileData);
     setProcessing(true);
     const res = await userAPI.imageSubmit(token, formData, amount);
-    if(res.error){
+    if (res.error) {
       return;
     }
     setPaymentModel(true);
@@ -207,11 +215,11 @@ const Transactions = () => {
 
   const handleTestResult = (data) => {
     const apiData = {
-      status : data,
+      status: data,
     };
     const token = params.token;
     setProcessing(true);
-    const testResultRes = userAPI.testResult(token, { ...apiData  });
+    const testResultRes = userAPI.testResult(token, { ...apiData });
     setProcessing(false);
     if (testResultRes) {
       setStatus({
@@ -221,11 +229,11 @@ const Transactions = () => {
     }
   };
 
-  const setTimerSeconds = ()=>{
+  const setTimerSeconds = () => {
     const difference = new Date(expireTime).getTime() - Date.now();
     const seconds = Math.floor(difference / 1000);
-    timer = seconds > 0 ? seconds: 0;
-  }
+    timer = seconds > 0 ? seconds : 0;
+  };
 
   return (
     <>
@@ -254,12 +262,12 @@ const Transactions = () => {
                     setRedirected={setRedirected}
                   />
                 )}
-                <header>
+                {/* <header>
                   <div className="icon">
                     <FcRating size={30} />
                     <p>Trust Pay</p>
                   </div>
-                </header>
+                </header> */}
                 <div className="main-content">
                   <Tabs
                     defaultActiveKey="1"
@@ -268,72 +276,55 @@ const Transactions = () => {
                     tabBarGutter={5}
                     style={{ marginTop: "-10px" }}
                   >
-                  {
-                    isQr &&
-                    <Tabs.TabPane tab="UPI" key="1">
-                      <Upi
-                        {...transactionsInformation}
-                        amount={amount}
-                      />
-                    </Tabs.TabPane>
-                  }
-                  {
-                    isBank &&
-                    <Tabs.TabPane tab="Bank Transfer" key="3">
-                      <Bank
-                        {...transactionsInformation}
-                        amount={amount}
-                      />
-                    </Tabs.TabPane>
-                  }
+                    {isQr && (
+                      <Tabs.TabPane tab="UPI" key="1">
+                        <Upi {...transactionsInformation} amount={amount} />
+                      </Tabs.TabPane>
+                    )}
+                    {isBank && (
+                      <Tabs.TabPane tab="Bank Transfer" key="3">
+                        <Bank {...transactionsInformation} amount={amount} />
+                      </Tabs.TabPane>
+                    )}
                   </Tabs>
-
-
-                  <Tabs defaultActiveKey="1" className="bottom-tabs" type="card">
+                  <Tabs
+                    defaultActiveKey="1"
+                    className="bottom-tabs"
+                    type="card"
+                  >
                     <Tabs.TabPane tab="Enter UTR" key="1">
                       <Form
                         layout="vertical"
                         onFinish={handleUtrNumber}
                         className="utr-number pt-[30px] mt-[-24px]"
                       >
-                          <Form.Item
-                            label={
-                              <span>
-                                Enter UTR Number
-                                <span
-                                  className="text-red-500"
-                                  style={{ marginLeft: 8 }}
-                                >
-                                  (* UTR can be submitted only once)
-                                </span>
-                              </span>
-                            }
-                            name="utrNumber"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Please enter UTR no",
-                              },
-                              {
-                                pattern: /^\d{12}$/,
-                                message: "UTR number must be exactly 12 digits",
-                              },
-                            ]}
+                        <Form.Item
+                          label={<span>Enter UTR Number</span>}
+                          name="utrNumber"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please enter UTR no",
+                            },
+                            {
+                              pattern: /^\d{12}$/,
+                              message: "UTR number must be exactly 12 digits",
+                            },
+                          ]}
+                        >
+                          <Input type="text" size="middle" maxLength={12} />
+                        </Form.Item>
+                        <Form.Item name="" label=" ">
+                          <Button
+                            type="primary"
+                            size="middle"
+                            htmlType="submit"
+                            loading={processing}
+                            className="ml-1"
                           >
-                            <Input type="text" size="middle" maxLength={12}
-                             />
-                          </Form.Item>
-                          <Form.Item name="" label=" ">
-                            <Button
-                              type="primary"
-                              size="middle"
-                              htmlType="submit"
-                              loading={processing}
-                              className="ml-1"
-                            >
-                              Submit
-                            </Button>
-                          </Form.Item>
+                            Submit
+                          </Button>
+                        </Form.Item>
                       </Form>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="Upload ScreenShot" key="2">
@@ -350,32 +341,142 @@ const Transactions = () => {
                             {
                               required: true,
                               message: "Please upload image first",
-                            }
+                            },
                           ]}
                         >
-                            <Input
-                              accept="image/*"
-                              type="file"
-                              size="middle"
-                              className="h-[32px] py-0 pt-[1px]"
-                            />
+                          <Input
+                            accept="image/*"
+                            type="file"
+                            size="middle"
+                            className="h-[32px] py-0 pt-[1px]"
+                          />
                         </Form.Item>
                         <Form.Item name="" label=" ">
-                            <Button
-                              type="primary"
-                              htmlType="submit"
-                              loading={processing}
-                              className="ml-1"
-                              size="middle"
-                            >
-                              Submit
-                            </Button>
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={processing}
+                            className="ml-1"
+                            size="middle"
+                          >
+                            Submit
+                          </Button>
                         </Form.Item>
                       </Form>
                     </Tabs.TabPane>
                   </Tabs>
+                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-serif">
+                    <div className="flex justify-center space-x-4">
+                      <img
+                        src={norton}
+                        alt="Norton Certification"
+                        className="w-24 h-24 object-contain rounded-md"
+                      />
+                      <img
+                        src={pcicertificate}
+                        alt="PCI Certificate"
+                        className="w-24 h-24 object-contain rounded-md"
+                      />
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-serif">
+                    <div className="border-t border-gray-200 pt-4 text-center bg-black">
+                      <h2 className="text-gray-50 font-semibold mb-2">
+                        {!showVideo && (
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowVideo(true); // Show the video when clicked
+                            }}
+                            className="text-gray-50 font-medium hover:underline"
+                          >
+                            Watch a video for Quick Deposit instructions:
+                          </a>
+                        )}
+                      </h2>
+
+                      {/* Video Section with Close Button */}
+                      {showVideo && (
+                        <div
+                          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-lg shadow-lg overflow-hidden"
+                          style={{
+                            width: "40%",
+                            maxWidth: "600px",
+                            paddingBottom: "30.25%",
+                          }}
+                        >
+                          <iframe
+                            src={videoUrl}
+                            title="Quick Deposit Instructions"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="absolute top-0 left-0 w-full h-full"
+                          ></iframe>
+                          <button
+                            onClick={() => setShowVideo(false)}
+                            className="absolute top-2 right-2 text-black bg-gray-300 rounded-full p-1 hover:bg-gray-400"
+                            aria-label="Close video"
+                          >
+                            &times; {/* Close icon (X) */}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Language Links */}
+                      <div className="space-y-2 mt-4">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowVideo(true); // Show the video when a language link is clicked
+                          }}
+                          className="text-gray-50 font-medium hover:underline"
+                        >
+                          Telugu -
+                        </a>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowVideo(true); // Show the video when a language link is clicked
+                          }}
+                          className="text-gray-50 font-medium hover:underline"
+                        >
+                          Hindi -
+                        </a>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowVideo(true); // Show the video when a language link is clicked
+                          }}
+                          className="text-gray-50 font-medium hover:underline"
+                        >
+                          Tamil -
+                        </a>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowVideo(true); // Show the video when a language link is clicked
+                          }}
+                          className="text-gray-50 font-medium hover:underline"
+                        >
+                          English
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Modal title="Attention" open={isModalOpen} footer={false} closable={false}>
+
+                <Modal
+                  title="Attention"
+                  open={isModalOpen}
+                  footer={false}
+                  closable={false}
+                >
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
                       <Form.Item
@@ -392,7 +493,12 @@ const Transactions = () => {
                           addonAfter="₹"
                           min={1}
                           onKeyDown={(e) => {
-                            if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
+                            if (
+                              e.key === "-" ||
+                              e.key === "e" ||
+                              e.key === "+" ||
+                              e.key === "."
+                            ) {
                               e.preventDefault();
                             }
                           }}
@@ -404,61 +510,70 @@ const Transactions = () => {
                           }}
                         />
                       </Form.Item>
-                      <Button type="primary" htmlType="submit" loading={amountLoading}>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={amountLoading}
+                      >
                         Submit
                       </Button>
                     </div>
                   </Form>
                 </Modal>
-                {isTestMode && <Modal
-                  title={
-                    <div className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6" style={{ width: '100%', zIndex: 1 }}>
-                      Welcome to Trust Pay
-                    </div>
-                  }
-                  open={showTrustPayModal}
-                  footer={
-                    <div className="flex flex-col items-center gap-4 py-4">
-                      <p className="text-zinc-600 text-lg text-center mb-6">
-                        This is a test Payment. You can choose it to be a success or failure.
-                      </p>
-                      <Button
-                        key="Test Success"
-                        type="primary"
-                        onClick={() => handleTestResult('TEST_SUCCESS')}
-                        className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
+                {isTestMode && (
+                  <Modal
+                    title={
+                      <div
+                        className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6"
+                        style={{ width: "100%", zIndex: 1 }}
                       >
-                        Test Success
-                      </Button>
-                      <Button
-                        key="Test Failure"
-                        type="primary"
-                        onClick={() => handleTestResult('TEST_DROPPED')}
-                        className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
-                      >
-                        Test Failure
-                      </Button>
-                    </div>
-                  }
-                  bodyStyle={{
-                    color: 'white',
-                    borderRadius: '0.5rem',
-                    padding: '1.5rem',
-                    boxShadow: 'none'
-                  }}
-                  style={{
-                    borderRadius: '0.75rem',
-                    width: '600px',
-                    position: 'relative' 
-                  }}
-                  headerStyle={{
-                    backgroundColor: 'black',
-                    color: 'white',
-                    borderBottom: 'none',
-                    boxShadow: 'none'
-                  }}
-                >
-                </Modal>}
+                        Welcome to Trust Pay
+                      </div>
+                    }
+                    open={showTrustPayModal}
+                    footer={
+                      <div className="flex flex-col items-center gap-4 py-4">
+                        <p className="text-zinc-600 text-lg text-center mb-6">
+                          This is a test Payment. You can choose it to be a
+                          success or failure.
+                        </p>
+                        <Button
+                          key="Test Success"
+                          type="primary"
+                          onClick={() => handleTestResult("TEST_SUCCESS")}
+                          className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
+                        >
+                          Test Success
+                        </Button>
+                        <Button
+                          key="Test Failure"
+                          type="primary"
+                          onClick={() => handleTestResult("TEST_DROPPED")}
+                          className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
+                        >
+                          Test Failure
+                        </Button>
+                      </div>
+                    }
+                    bodyStyle={{
+                      color: "white",
+                      borderRadius: "0.5rem",
+                      padding: "1.5rem",
+                      boxShadow: "none",
+                    }}
+                    style={{
+                      borderRadius: "0.75rem",
+                      width: "600px",
+                      position: "relative",
+                    }}
+                    headerStyle={{
+                      backgroundColor: "black",
+                      color: "white",
+                      borderBottom: "none",
+                      boxShadow: "none",
+                    }}
+                  ></Modal>
+                )}
               </div>
             </>
           )}
