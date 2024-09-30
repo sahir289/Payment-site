@@ -113,7 +113,6 @@ const Transactions = () => {
     // else {
     //   setIsModalOpen(true);
     // }
-    setIsModalOpen(true);
   };
 
   const handleValidateToken = async () => {
@@ -136,11 +135,16 @@ const Transactions = () => {
       });
       return;
     }
+    userAPI.payInOneTimeExpireURL(token)
     if (data?.expiryTime) {
       expireTime = data.expiryTime * 1000;
       setTimerSeconds();
     }
-    await userAPI.payInOneTimeExpireURL(token);
+    if(Number(data?.amount) > 0){
+      handleAmount(data);
+      return;
+    }
+    setIsModalOpen(true);
   };
 
   const handleUtrNumber = async (data) => {
@@ -156,7 +160,7 @@ const Transactions = () => {
     setProcessing(false);
     if (res?.data?.data) {
       setPaymentModel(true);
-      setModelData(res?.data?.data);
+      setModelData({ ...res?.data?.data, utr: data.utrNumber });
     }
   };
 
