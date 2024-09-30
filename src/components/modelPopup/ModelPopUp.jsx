@@ -5,11 +5,7 @@ import { CheckIcon, ClockIcon } from '../../utils/constants';
 
 const ModelPopUp = (props) => {
     const { paymentModel, modelData, redirected, setRedirected } = props;
-    console.log("🚀 ~ ModelPopUp ~ modelData:", modelData)
-    console.log("🚀 ~ ModelPopUp ~ paymentModel:", paymentModel)
     const [isModalOpen, setIsModalOpen] = useState(false);
-    console.log("🚀 ~ setTimeout ~ modelData?.return_url:", modelData?.return_url)
-
 
     // Also add the notify url and data to give data to user.
 
