@@ -102,17 +102,7 @@ const Transactions = () => {
         });
       }, 10000);
     }
-    // check this
-    // if (res?.data?.data?.amount !== 0) {
-    //   setIsModalOpen(false);
-    //   const data = {
-    //     amount: res?.data?.data?.amount,
-    //   }
-    //   // handleAmount(data);
-    // }
-    // else {
-    //   setIsModalOpen(true);
-    // }
+
   };
 
   const handleValidateToken = async () => {
@@ -160,7 +150,7 @@ const Transactions = () => {
     setProcessing(false);
     if (res?.data?.data) {
       setPaymentModel(true);
-      setModelData({ ...res?.data?.data, utr: data.utrNumber });
+      setModelData({ ...res?.data?.data});
     }
   };
 
