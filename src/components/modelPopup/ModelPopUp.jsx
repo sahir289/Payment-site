@@ -26,13 +26,13 @@ const ModelPopUp = (props) => {
         <Modal open={paymentModel} width={900} className='font-serif' footer={false}>
             <div className='flex justify-center mt-10'>
                 <div className='bg-green-800 w-32 h-32 rounded-[100%] flex' >
-                    {modelData?.status === "Success" && <div className='flex ps-5 mt-4'> <CheckIcon /></div>}
+                    {modelData?.status === "SUCCESS" && <div className='flex ps-5 mt-4'> <CheckIcon /></div>}
                     {modelData?.status === "PENDING" && <span className='flex items-center ps-2'><ClockIcon /></span>}
                 </div>
 
             </div>
             <div className='flex justify-center mt-5 text-3xl  font-bold'>
-                <p>{modelData?.status === "Success" && "Payment completed"}{modelData?.status === "PENDING" && "UTR Submitted!!!"}{modelData?.status === "DUPLICATE" && "Duplicate UTR found!!!"}
+                <p>{modelData?.status === "SUCCESS" && "Payment completed"}{modelData?.status === "PENDING" && "UTR Submitted!!!"}{modelData?.status === "DUPLICATE" && "Duplicate UTR found!!!"}
                     {modelData?.status === "DISPUTE" && "There is an Dispute in payment"}
                 </p>
             </div>
@@ -43,15 +43,15 @@ const ModelPopUp = (props) => {
             <div className='mt-16'>
                 <div className='flex justify-between'>
                     <p className='text-xl '>Amount</p>
-                    <p className='text-xl  font-bold '>{modelData?.status === "Success" ? modelData?.amount : modelData?.status === "PENDING" ? modelData?.amount : "--"}</p>
+                    <p className='text-xl  font-bold '>{modelData?.status === "SUCCESS" ? modelData?.amount : modelData?.status === "PENDING" ? modelData?.amount : "--"}</p>
                 </div>
                 <div className='flex justify-between mt-6'>
                     <p className='text-xl  '>UTR No.</p>
-                    <p className='text-xl  font-bold '>{modelData?.utr ? modelData?.utr : "--"}</p>
+                    <p className='text-xl  font-bold '>{modelData?.utr_id ? modelData?.utr_id : "--"}</p>
                 </div>
                 <div className='flex justify-between  mt-6'>
                     <p className='text-xl  '>Transaction Id.</p>
-                    <p className='text-xl  font-bold '>{modelData?.transactionId}</p>
+                    <p className='text-xl  font-bold '>{modelData?.merchant_order_id}</p>
                 </div>
             </div>
 

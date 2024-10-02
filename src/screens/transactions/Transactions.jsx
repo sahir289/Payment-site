@@ -88,7 +88,7 @@ const Transactions = () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
     // res.data.data.amount = 5000000;
-    if (res?.data?.data?.status === "Success") {
+    if (res?.data?.data?.status === "SUCCESS") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
     } else if (res?.data?.data?.status === "DISPUTE") {
