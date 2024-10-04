@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button , notification } from "antd";
 import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
 import { useParams } from "react-router-dom";
@@ -156,30 +156,61 @@ const Transactions = () => {
 
   const handleAmount = async (data) => {
     const token = params.token;
-    setAmount(data.amount);
-    const amount = data;
+    const amount = parseFloat(data.amount);
+    setAmount(amount);
     setAmountLoading(true);
-    const res = await userAPI.assignBankToPayInUrl(token, amount);
-    setAmountLoading(false);
+  
+    const res = await userAPI.assignBankToPayInUrl(token, { amount });
+    setAmountLoading(false); 
+    console.log("API Response:", res); 
+    
     if (res.error?.error?.status === 404) {
+      console.log("Error 404: Bank is not linked with the merchant!"); 
       setStatus({
         status: "404",
         message: "Bank is not linked with the merchant!",
       });
       expireUrlHandler();
-      return;
-    } else {
-      isTestMode && setShowTrustPayModal(true);
+      return; 
     }
+  
     const bankData = res?.data?.data || null;
+    
     setTransactionInformation(bankData);
-    if (!bankData.is_bank && !bankData.is_qr) {
+    if (!bankData) {
       setStatus({
         status: "404",
-        message: "No payment methods are available!",
+        message: "No bank data available!",
       });
-      return;
+      return; 
     }
+    if (!bankData.is_bank && !bankData.is_qr) {
+      console.log("Non-bank error:", bankData); 
+      setStatus({
+        status: "404",
+        message: "No payment methods are available!", 
+      });
+      return; 
+    }
+  
+    // Validate if the amount is within the ranges
+    const minPayin = parseFloat(bankData.min_payin); 
+    const maxPayin = parseFloat(bankData.max_payin); 
+    console.log("Min Payin:", minPayin, "Max Payin:", maxPayin);
+
+    // Check if the amount is within the valid range
+    if (amount < minPayin || amount > maxPayin) {
+      notification.error({
+        message: `Amount must be between ${minPayin} and ${maxPayin}!`,
+      });
+  
+      if (amountInputRef.current) {
+        amountInputRef.current.focus();
+      }
+      
+      return; 
+    }
+
     setIsModalOpen(false);
   };
 
