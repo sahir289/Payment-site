@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button , notification } from "antd";
 import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
 import { useParams } from "react-router-dom";
@@ -156,30 +156,55 @@ const Transactions = () => {
 
   const handleAmount = async (data) => {
     const token = params.token;
-    setAmount(data.amount);
-    const amount = data;
+    const amount = parseFloat(data.amount);
+    setAmount(amount);
     setAmountLoading(true);
-    const res = await userAPI.assignBankToPayInUrl(token, amount);
-    setAmountLoading(false);
+  
+    const res = await userAPI.assignBankToPayInUrl(token, { amount });
+    setAmountLoading(false);     
     if (res.error?.error?.status === 404) {
       setStatus({
         status: "404",
         message: "Bank is not linked with the merchant!",
       });
       expireUrlHandler();
-      return;
-    } else {
-      isTestMode && setShowTrustPayModal(true);
+      return; 
     }
+  
     const bankData = res?.data?.data || null;
+    
     setTransactionInformation(bankData);
+    if (!bankData) {
+      setStatus({
+        status: "404",
+        message: "No bank data available!",
+      });
+      return; 
+    }
     if (!bankData.is_bank && !bankData.is_qr) {
       setStatus({
         status: "404",
-        message: "No payment methods are available!",
+        message: "No payment methods are available!", 
       });
-      return;
+      return; 
     }
+  
+    // Validate if the amount is within the ranges
+    const minPayin = parseFloat(bankData.min_payin); 
+    const maxPayin = parseFloat(bankData.max_payin);
+    // Check if the amount is within the valid range
+    if (amount < minPayin || amount > maxPayin) {
+      notification.error({
+        message: `Amount must be between ${minPayin} and ${maxPayin}!`,
+      });
+  
+      if (amountInputRef.current) {
+        amountInputRef.current.focus();
+      }
+      
+      return; 
+    }
+
     setIsModalOpen(false);
   };
 
