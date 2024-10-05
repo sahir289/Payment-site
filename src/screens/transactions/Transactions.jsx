@@ -161,11 +161,8 @@ const Transactions = () => {
     setAmountLoading(true);
   
     const res = await userAPI.assignBankToPayInUrl(token, { amount });
-    setAmountLoading(false); 
-    console.log("API Response:", res); 
-    
+    setAmountLoading(false);     
     if (res.error?.error?.status === 404) {
-      console.log("Error 404: Bank is not linked with the merchant!"); 
       setStatus({
         status: "404",
         message: "Bank is not linked with the merchant!",
@@ -185,7 +182,6 @@ const Transactions = () => {
       return; 
     }
     if (!bankData.is_bank && !bankData.is_qr) {
-      console.log("Non-bank error:", bankData); 
       setStatus({
         status: "404",
         message: "No payment methods are available!", 
@@ -195,9 +191,7 @@ const Transactions = () => {
   
     // Validate if the amount is within the ranges
     const minPayin = parseFloat(bankData.min_payin); 
-    const maxPayin = parseFloat(bankData.max_payin); 
-    console.log("Min Payin:", minPayin, "Max Payin:", maxPayin);
-
+    const maxPayin = parseFloat(bankData.max_payin);
     // Check if the amount is within the valid range
     if (amount < minPayin || amount > maxPayin) {
       notification.error({
