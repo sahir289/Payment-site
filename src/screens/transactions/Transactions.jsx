@@ -176,7 +176,6 @@ const Transactions = () => {
   
     const bankData = res?.data?.data || null;
     
-    setTransactionInformation(bankData);
     if (!bankData) {
       setStatus({
         status: "404",
@@ -194,8 +193,8 @@ const Transactions = () => {
     }
   
     // Validate if the amount is within the ranges
-    const minPayin = parseFloat(bankData.min_payin); 
-    const maxPayin = parseFloat(bankData.max_payin);
+    const minPayin = parseFloat(bankData.merchant_min_payin); 
+    const maxPayin = parseFloat(bankData.merchant_max_payin);
     // Check if the amount is within the valid range
     if (amount < minPayin || amount > maxPayin) {
       notification.error({
@@ -207,6 +206,10 @@ const Transactions = () => {
       }
       
       return; 
+    }
+
+    if (res.data.statusCode === 201) {
+      setTransactionInformation(bankData);
     }
 
     setIsModalOpen(false);
