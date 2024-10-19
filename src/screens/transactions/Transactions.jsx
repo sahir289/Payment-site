@@ -32,7 +32,6 @@ const Transactions = () => {
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
-  console.log("🚀 ~ Transactions ~ isTestMode:", isTestMode)
   const videoUrl = "https://www.youtube.com/embed/ZqoSbktPThs";
 
   const _10_MINUTES = 1000 * 60 * 10;
