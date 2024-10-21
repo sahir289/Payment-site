@@ -70,18 +70,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-inline: 8 px;
+  /* padding-inline: 8 px; */
   font-size: 18px;
   color: black;
   font-weight: 500;
-  padding-left: 16px;
+  /* padding-left: 16px; */
 }
 
 .icon-copy {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: black;
+  /* background-color: black; */
   padding: 8px;
   cursor: pointer;
   border-radius: 50%;

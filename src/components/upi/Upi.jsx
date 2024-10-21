@@ -35,7 +35,6 @@ const Upi = ({ code, amount, upi_id,ac_name }) => {
             <div className="icon-copy" >
               <RiFileCopyFill size={20} color='white' onClick={() => copyToClipboard(upi_id)} />
             </div>
-
           </div>
         </div>
         <Divider />
@@ -48,7 +47,7 @@ const Upi = ({ code, amount, upi_id,ac_name }) => {
             </div>
           </div>
         </div>
-        <Divider />
+        <Divider /> */}
       </div>
     </section>
   )

@@ -37,9 +37,9 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
           <div className="account-details">
             <span className="bank-value">{bank_name}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(bank_name)}
               />
             </div>
@@ -49,11 +49,11 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
         <div className="details-section">
           <p>Account No</p>
           <div className="account-details">
-            <span className="text-value">{ac_no}</span>
+            <span className="text-value-bank">{ac_no}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(ac_no)}
               />
             </div>
@@ -65,9 +65,9 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
           <div className="account-details">
             <span className="bank-value">{name}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(name)}
               />
             </div>
@@ -77,11 +77,11 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
         <div className="details-section">
           <p>IFSC Code</p>
           <div className="account-details">
-            <span className="text-value">{ifsc}</span>
+            <span className="text-value-bank">{ifsc}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(ifsc)}
               />
             </div>
