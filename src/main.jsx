@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ConfigProvider theme={{
       token: {
-        colorPrimary: "orange",
+        colorPrimary: "cornflowerblue",
       }
     }}>
       <App />
