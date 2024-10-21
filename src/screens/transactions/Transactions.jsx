@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button , notification } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button , notification, Upload } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
 import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
 import { useParams } from "react-router-dom";
@@ -32,7 +33,7 @@ const Transactions = () => {
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
-  const videoUrl = "https://www.youtube.com/embed/ZqoSbktPThs";
+  const videoUrl = "https://drive.google.com/file/d/1EAGL_TTjx2kn_hsB6S0gE1x4-d1YywjP/preview";
 
   const _10_MINUTES = 1000 * 60 * 10;
   let timer = 60 * 10;
@@ -140,7 +141,7 @@ const Transactions = () => {
   const handleUtrNumber = async (data) => {
     const updateData = {
       usrSubmittedUtr: data?.utrNumber,
-      code: transactionsInformation?.code,
+      // code: transactionsInformation?.code,
       amount,
     };
     setProcessing(true);
@@ -296,7 +297,6 @@ const Transactions = () => {
                 <div className="main-content">
                   <Tabs
                     defaultActiveKey="1"
-                    className="tabs"
                     type="card"
                     tabBarGutter={5}
                     style={{ marginTop: "-10px" }}
@@ -314,14 +314,14 @@ const Transactions = () => {
                   </Tabs>
                   <Tabs
                     defaultActiveKey="1"
-                    className="bottom-tabs"
+                    className="bottom-tabs mt-[-18px]"
                     type="card"
                   >
                     <Tabs.TabPane tab="Enter UTR" key="1">
                       <Form
                         layout="vertical"
                         onFinish={handleUtrNumber}
-                        className="utr-number pt-[30px] mt-[-24px]"
+                        className="utr-number pt-[15px] mt-[-24px]"
                       >
                         <Form.Item
                           label={<span>Enter UTR Number</span>}
@@ -345,7 +345,7 @@ const Transactions = () => {
                             size="middle"
                             htmlType="submit"
                             loading={processing}
-                            className="ml-1"
+                            className="ml-1 text-black"
                           >
                             Submit
                           </Button>
@@ -375,6 +375,9 @@ const Transactions = () => {
                             size="middle"
                             className="h-[32px] py-0 pt-[1px]"
                           />
+                          {/* <Upload>
+                            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                          </Upload> */}
                         </Form.Item>
                         <Form.Item name="" label=" ">
                           <Button
@@ -539,6 +542,7 @@ const Transactions = () => {
                         type="primary"
                         htmlType="submit"
                         loading={amountLoading}
+                        className="text-black"
                       >
                         Submit
                       </Button>
@@ -549,13 +553,14 @@ const Transactions = () => {
                   <Modal
                     title={
                       <div
-                        className="absolute inset-x-0 top-0 text-center text-2xl text-white bg-black py-6"
-                        style={{ width: "100%", zIndex: 1 }}
+                        className="absolute inset-x-0 top-0 text-center text-2xl text-black py-6"
+                        style={{ width: "100%", zIndex: 1, backgroundColor:"cornflowerblue" }}
                       >
                         Welcome to Trust Pay
                       </div>
                     }
                     open={showTrustPayModal}
+                    closable={false}
                     footer={
                       <div className="flex flex-col items-center gap-4 py-4">
                         <p className="text-zinc-600 text-lg text-center mb-6">
@@ -566,7 +571,7 @@ const Transactions = () => {
                           key="Test Success"
                           type="primary"
                           onClick={() => handleTestResult("TEST_SUCCESS")}
-                          className="bg-green-600 border-green-600 text-white w-80 h-12 text-lg"
+                          className="bg-green-600 border-green-600 text-black w-80 h-12 text-lg"
                         >
                           Test Success
                         </Button>
@@ -574,26 +579,26 @@ const Transactions = () => {
                           key="Test Failure"
                           type="primary"
                           onClick={() => handleTestResult("TEST_DROPPED")}
-                          className="bg-red-600 border-red-600 text-white w-80 h-12 text-lg"
+                          className="bg-red-600 border-red-600 text-black w-80 h-12 text-lg"
                         >
                           Test Failure
                         </Button>
                       </div>
                     }
                     bodyStyle={{
-                      color: "white",
-                      borderRadius: "0.5rem",
+                      color: "black",
+                      borderRadius: "10px",
                       padding: "1.5rem",
                       boxShadow: "none",
                     }}
                     style={{
-                      borderRadius: "0.75rem",
+                      borderRadius: "10px",
                       width: "600px",
                       position: "relative",
                     }}
                     headerStyle={{
                       backgroundColor: "black",
-                      color: "white",
+                      color: "black",
                       borderBottom: "none",
                       boxShadow: "none",
                     }}
