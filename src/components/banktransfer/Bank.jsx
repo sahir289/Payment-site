@@ -5,63 +5,92 @@ import { RiFileCopyFill } from "react-icons/ri";
 import { copyToClipboard } from '../../utils';
 import "./Bank.css"
 
-const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount }) => {
+const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
 
 
   return (
     <section>
       <div className="bank-container">
-        <p className='text'>Payment Time Left</p>
+        <p className="text">Payment Time Left</p>
         <div className="right-area">
-          <MdOutlineTimer size={20} color='white' />
-          <p className='timer-text' id='bank-timer'>00:10:00</p>
+          <MdOutlineTimer size={20} color="white" />
+          <p className="timer-text" id="bank-timer">
+            00:10:00
+          </p>
         </div>
       </div>
       <div className="section-container">
         <div className="section-to">
-          <span>Scan & Pay the exact amount only<br /> (upto lakh ) submit UTR</span>
+          <span>
+            Scan & Pay the exact amount only
+            <br /> (upto lakh ) submit UTR
+          </span>
         </div>
         <Divider />
         <div className="amount-container">
-          <p className='amount-text'>Transfer Amount</p>
-          <p className='price'>Rs{amount}/-</p>
+          <p className="amount-text">Transfer Amount</p>
+          <p className="price">Rs{amount}/-</p>
         </div>
         <Divider />
         <div className="details">
           <p>Bank</p>
-          <span className='bank-value'>{bank_name}</span>
+          <div className="account-details">
+            <span className="bank-value">{bank_name}</span>
+            <div className="icon-copy">
+              <RiFileCopyFill
+                size={20}
+                color="white"
+                onClick={() => copyToClipboard(bank_name)}
+              />
+            </div>
+          </div>
         </div>
         <Divider />
         <div className="details-section">
           <p>Account No</p>
           <div className="account-details">
-            <span className="text-value" >{ac_no}</span>
+            <span className="text-value">{ac_no}</span>
             <div className="icon-copy">
-              <RiFileCopyFill size={20} color='white' onClick={() => copyToClipboard(ac_no)} />
+              <RiFileCopyFill
+                size={20}
+                color="white"
+                onClick={() => copyToClipboard(ac_no)}
+              />
             </div>
-
           </div>
         </div>
         <Divider />
         <div className="details">
           <p>Name</p>
-          <span className='bank-value'>{ac_name}</span>
+          <div className="account-details">
+            <span className="bank-value">{name}</span>
+            <div className="icon-copy">
+              <RiFileCopyFill
+                size={20}
+                color="white"
+                onClick={() => copyToClipboard(name)}
+              />
+            </div>
+          </div>
         </div>
         <Divider />
         <div className="details-section">
           <p>IFSC Code</p>
           <div className="account-details">
-            <span className='text-value'>{ifsc}</span>
-            <div className="icon-copy" >
-              <RiFileCopyFill size={20} color='white' onClick={() => copyToClipboard(ifsc)} />
+            <span className="text-value">{ifsc}</span>
+            <div className="icon-copy">
+              <RiFileCopyFill
+                size={20}
+                color="white"
+                onClick={() => copyToClipboard(ifsc)}
+              />
             </div>
-
           </div>
         </div>
         <Divider />
       </div>
     </section>
-  )
+  );
 }
 
 export default Bank;
