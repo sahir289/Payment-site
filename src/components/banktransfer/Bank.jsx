@@ -37,9 +37,9 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
           <div className="account-details">
             <span className="bank-value">{bank_name}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(bank_name)}
               />
             </div>
@@ -65,9 +65,9 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
           <div className="account-details">
             <span className="bank-value">{name}</span>
             <div className="icon-copy">
-              <RiFileCopyFill
+              <MdCopyAll
                 size={20}
-                color="white"
+                color="black"
                 onClick={() => copyToClipboard(name)}
               />
             </div>
