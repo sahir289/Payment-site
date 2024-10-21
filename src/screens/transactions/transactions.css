@@ -18,15 +18,15 @@ header {
 }
 
 .ant-tabs-content-holder {
-    border-top-right-radius: 10px;
-    border-top-left-radius: 10px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
     padding: 10px;
     margin-top: -16px;
 }
 
 .utr-number {
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     padding-left: 10px;
     padding-right: 10px;
     display: grid;
@@ -41,7 +41,7 @@ header {
 
 .tabs {
     width: 100%;
-    border-radius: 10px;
+    border-radius: 0px;
 }
 
 .icon {
@@ -50,11 +50,11 @@ header {
     align-items: center;
     gap: 10px;
     font-size: 26px;
-    color: black;
+    color: white;
 }
 
 .ant-tabs-nav-list {
-    width: 100% !important;
+    width: 100%;
     background-color: rgb(247, 247, 247);
     padding: 15px;
 }
@@ -63,7 +63,6 @@ header {
     margin-top: 10px !important;
     border-radius: 5px !important;
     overflow: hidden;
-    border-radius: 10px !important;
 }
 
 .ant-tabs-tab {
@@ -80,10 +79,9 @@ header {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    background-color: cornflowerblue !important;
+    background-color: black !important;
     font-size: 16px !important;
-    color: black !important;
-    border-radius: 10px !important;
+    color: white !important;
 }
 
 .ant-tabs-tab-btn {
@@ -91,7 +89,7 @@ header {
 }
 
 .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: black !important;
+    color: whitesmoke !important;
 }
 
 /* loader css */
