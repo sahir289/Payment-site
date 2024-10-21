@@ -1,6 +1,6 @@
 .upi-section .amount-container{
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
 }
 .upi-section .qr-container{
   display: flex;
@@ -10,10 +10,10 @@
 .Upi-details{
   display: flex;
   align-items: center;
-  gap: 1px;
+  gap: 5px;
 }
 .text-value{
-  font-size: 10px;
+  font-size: 14px;
   color: grey;
   font-weight: 600;
 }
