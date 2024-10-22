@@ -22,8 +22,6 @@ const ModelPopUp = (props) => {
         return () => clearTimeout(timer);
     }, [modelData]);
 
-    console.log(modelData);
-
     return (
         <Modal open={paymentModel} width={900} closable={false} className='font-sans' footer={false} style={{borderRadius:"10px"}} >
             <div className='flex justify-center'>
