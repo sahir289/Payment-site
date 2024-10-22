@@ -14,7 +14,7 @@ header {
 
 .utr-number,
 .ant-tabs-content-holder {
-    background-color: #f7f7f7;
+    background-color: rgb(250, 250, 242);
 }
 
 .ant-tabs-content-holder {
@@ -55,7 +55,8 @@ header {
 
 .ant-tabs-nav-list {
     width: 100% !important;
-    background-color: rgb(247, 247, 247);
+    /* background-color: rgb(247, 247, 247); */
+    background-color: rgb(250, 250, 242);
     padding: 15px;
 }
 
@@ -133,5 +134,21 @@ header {
   .fade-in.show {
     opacity: 1;
   }
+
+  .certi-bg {
+    background-color: rgb(250, 250, 242);
+  }
+
+  .custom-modal .ant-modal-content {
+    background-color: rgb(250, 250, 242); /* Set the desired background color */
+  }
   
+  .custom-modal .ant-modal-header {
+    background-color: rgb(250, 250, 242); /* Optional: change header background */
+    color: white; /* Optional: change text color */
+  }
+  
+  .custom-modal .ant-modal-body {
+    background-color: rgb(250, 250, 242); /* Set background color for the body */
+  }
   
