@@ -285,6 +285,8 @@ const Transactions = () => {
                     paymentModel={paymentModel}
                     modelData={modelData}
                     redirected={redirected}
+                    centered={true}
+                    closable={false}
                     setRedirected={setRedirected}
                   />
                 )}
@@ -385,7 +387,7 @@ const Transactions = () => {
                             type="primary"
                             htmlType="submit"
                             loading={processing}
-                            className="ml-1"
+                            className="ml-1 text-black"
                             size="middle"
                           >
                             Submit
@@ -394,7 +396,7 @@ const Transactions = () => {
                       </Form>
                     </Tabs.TabPane>
                   </Tabs>
-                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-serif">
+                  <div className="certi-bg rounded-lg shadow-md mx-auto w-full font-serif">
                     <div className="flex justify-center space-x-4">
                       <img
                         src={norton}
@@ -408,9 +410,9 @@ const Transactions = () => {
                       />
                     </div>
                   </div>
-                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-serif">
-                    <div className="border-t border-gray-200 pt-4 text-center bg-black">
-                      <h2 className="text-gray-50 font-semibold mb-2">
+                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-sans">
+                    <div className="border-t border-gray-200 pt-2 text-center" style={{backgroundColor:"cornflowerblue", borderRadius:"10px"}}>
+                      <h2 className="text-black font-semibold mb-2">
                         {!showVideo && (
                           <a
                             href="#"
@@ -418,7 +420,7 @@ const Transactions = () => {
                               e.preventDefault();
                               setShowVideo(true); // Show the video when clicked
                             }}
-                            className="text-gray-50 font-medium hover:underline"
+                            className="text-black font-medium hover:underline"
                           >
                             Watch a video for Quick Deposit instructions:
                           </a>
@@ -454,14 +456,14 @@ const Transactions = () => {
                       )}
 
                       {/* Language Links */}
-                      <div className="space-y-2 mt-4">
+                      <div className="space-y-2 mt-2">
                         <a
                           href="#"
                           onClick={(e) => {
                             e.preventDefault();
                             setShowVideo(true); // Show the video when a language link is clicked
                           }}
-                          className="text-gray-50 font-medium hover:underline"
+                          className="text-black font-medium hover:underline"
                         >
                           Telugu -
                         </a>
@@ -471,7 +473,7 @@ const Transactions = () => {
                             e.preventDefault();
                             setShowVideo(true); // Show the video when a language link is clicked
                           }}
-                          className="text-gray-50 font-medium hover:underline"
+                          className="text-black font-medium hover:underline"
                         >
                           Hindi -
                         </a>
@@ -481,7 +483,7 @@ const Transactions = () => {
                             e.preventDefault();
                             setShowVideo(true); // Show the video when a language link is clicked
                           }}
-                          className="text-gray-50 font-medium hover:underline"
+                          className="text-black font-medium hover:underline"
                         >
                           Tamil -
                         </a>
@@ -491,7 +493,7 @@ const Transactions = () => {
                             e.preventDefault();
                             setShowVideo(true); // Show the video when a language link is clicked
                           }}
-                          className="text-gray-50 font-medium hover:underline"
+                          className="text-black font-medium hover:underline"
                         >
                           English
                         </a>
@@ -501,10 +503,12 @@ const Transactions = () => {
                 </div>
 
                 <Modal
-                  title="Attention"
+                  title={<div style={{ textAlign: 'center' }}>Amount</div>}
                   open={isModalOpen}
                   footer={false}
+                  className="custom-modal"
                   closable={false}
+                  centered={true}
                 >
                   <Form layout="vertical" onFinish={handleAmount}>
                     <div>
@@ -519,7 +523,7 @@ const Transactions = () => {
                           type="number"
                           placeholder="Enter New Amount"
                           size="large"
-                          addonAfter="₹"
+                          addonBefore="₹"
                           min={1}
                           onKeyDown={(e) => {
                             if (
@@ -541,6 +545,7 @@ const Transactions = () => {
                       </Form.Item>
                       <Button
                         type="primary"
+                        className="text-black"
                         htmlType="submit"
                         loading={amountLoading}
                       >
@@ -549,6 +554,7 @@ const Transactions = () => {
                     </div>
                   </Form>
                 </Modal>
+
                 {isTestMode && (
                   <Modal
                     title={
@@ -559,7 +565,9 @@ const Transactions = () => {
                         Welcome to Trust Pay
                       </div>
                     }
+                    className="custom-modal"
                     open={showTrustPayModal}
+                    closable={false}
                     footer={
                       <div className="flex flex-col items-center gap-4 py-4">
                         <p className="text-zinc-600 text-lg text-center mb-6">
@@ -586,6 +594,7 @@ const Transactions = () => {
                     }
                     bodyStyle={{
                       color: "black",
+                      backgroundColor: "rgb(250, 250, 242)",
                       borderRadius: "10px",
                       padding: "1.5rem",
                       boxShadow: "none",
@@ -594,12 +603,17 @@ const Transactions = () => {
                       borderRadius: "10px",
                       width: "600px",
                       position: "relative",
+                      // backgroundColor: "rgb(250, 250, 242)",
                     }}
                     headerStyle={{
-                      backgroundColor: "black",
+                      backgroundColor: "rgb(250, 250, 242)",
+                      // borderRadius: "10px",
                       color: "black",
                       borderBottom: "none",
                       boxShadow: "none",
+                    }}
+                    footerStyle={{
+                      backgroundColor: "rgb(250, 250, 242)",
                     }}
                   ></Modal>
                 )}
