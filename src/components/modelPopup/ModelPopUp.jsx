@@ -61,7 +61,7 @@ const ModelPopUp = (props) => {
                 </div>
                 <div className='flex justify-between mt-3'>
                     <p className='text-lg font-bold'>Transaction ID.</p>
-                    <p className='text-xs font-bold' style={{paddingLeft: "68px", color: "cornflowerblue"}} >{modelData?.status === "Not Found" ? modelData?.transactionId : modelData?.status === "DUPLICATE" ? modelData?.transactionId : modelData?.merchant_order_id}</p>
+                    <p className='text-xs font-bold' style={{paddingLeft: "68px", color: "cornflowerblue"}} >{modelData?.merchant_order_id}</p>
                 </div>
             </div>
 
