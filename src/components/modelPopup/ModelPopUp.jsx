@@ -53,7 +53,7 @@ const ModelPopUp = (props) => {
             <div className='mt-5'>
                 <div className='flex justify-between'>
                     <p className='text-lg font-bold'>Amount</p>
-                    <p className='text-lg font-bold' style={{color: "cornflowerblue"}} >{modelData?.status === "SUCCESS" ? `₹${modelData?.amount}` : modelData?.status === "PENDING" ? `₹${modelData?.amount}` : modelData?.status === "BANK_MISMATCH" ? `₹${modelData?.amount}` : modelData?.status === "Not Found" ? `₹${modelData?.amount}` : modelData?.status === "DUPLICATE" ? `₹${modelData?.amount}` : "--"}</p>
+                    <p className='text-lg font-bold' style={{color: "cornflowerblue"}} >{modelData?.status === "SUCCESS" ? `₹${modelData?.amount}` : modelData?.status === "PENDING" ? `₹${modelData?.amount}` : modelData?.status === "BANK_MISMATCH" ? `₹${modelData?.amount}` : modelData?.status === "Not Found" ? `₹${modelData?.amount}` : modelData?.status === "DUPLICATE" ? `₹${modelData?.amount}` : modelData?.status === "DISPUTE" ? `₹${modelData?.amount}` : "--"}</p>
                 </div>
                 <div className='flex justify-between mt-3'>
                     <p className='text-lg font-bold'>UTR No.</p>
