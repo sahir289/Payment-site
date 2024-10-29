@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button , notification, Upload } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button, notification, Upload } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { FcRating } from "react-icons/fc";
 import { Upi, Bank } from "../../components";
@@ -131,7 +131,7 @@ const Transactions = () => {
       expireTime = data.expiryTime * 1000;
       setTimerSeconds();
     }
-    if(Number(data?.amount) > 0){
+    if (Number(data?.amount) > 0) {
       handleAmount(data);
       return;
     }
@@ -151,7 +151,7 @@ const Transactions = () => {
     setProcessing(false);
     if (res?.data?.data) {
       setPaymentModel(true);
-      setModelData({ ...res?.data?.data});
+      setModelData({ ...res?.data?.data });
     }
   };
 
@@ -160,52 +160,52 @@ const Transactions = () => {
     const amount = parseFloat(data.amount);
     setAmount(amount);
     setAmountLoading(true);
-  
+
     const res = await userAPI.assignBankToPayInUrl(token, { amount });
-    setAmountLoading(false);     
+    setAmountLoading(false);
     if (res.error?.error?.status === 404) {
       setStatus({
         status: "404",
         message: "Bank is not linked with the merchant!",
       });
       expireUrlHandler();
-      return; 
-    }else {
+      return;
+    } else {
       isTestMode && setShowTrustPayModal(true);
     }
-  
+
     const bankData = res?.data?.data || null;
-    
+
     if (!bankData) {
       setStatus({
         status: "404",
         message: "No bank data available!",
       });
-      return; 
+      return;
     }
-    
+
     if (!bankData.is_bank && !bankData.is_qr) {
       setStatus({
         status: "404",
-        message: "No payment methods are available!", 
+        message: "No payment methods are available!",
       });
-      return; 
+      return;
     }
-  
+
     // Validate if the amount is within the ranges
-    const minPayin = parseFloat(bankData.merchant_min_payin); 
+    const minPayin = parseFloat(bankData.merchant_min_payin);
     const maxPayin = parseFloat(bankData.merchant_max_payin);
     // Check if the amount is within the valid range
     if (amount < minPayin || amount > maxPayin) {
       notification.error({
         message: `Amount must be between ${minPayin} and ${maxPayin}!`,
       });
-  
+
       if (amountInputRef.current) {
         amountInputRef.current.focus();
       }
-      
-      return; 
+
+      return;
     }
 
     if (res.data.statusCode === 201) {
@@ -411,7 +411,7 @@ const Transactions = () => {
                     </div>
                   </div>
                   <div className="bg-white rounded-lg shadow-md mx-auto w-full font-sans">
-                    <div className="border-t border-gray-200 pt-2 text-center" style={{backgroundColor:"cornflowerblue", borderRadius:"10px"}}>
+                    <div className="border-t border-gray-200 pt-2 text-center" style={{ backgroundColor: "cornflowerblue", borderRadius: "10px" }}>
                       <h2 className="text-black font-semibold mb-2">
                         {!showVideo && (
                           <a
@@ -560,7 +560,7 @@ const Transactions = () => {
                     title={
                       <div
                         className="absolute inset-x-0 top-0 text-center text-2xl text-black py-6"
-                        style={{ width: "100%", zIndex: 1, backgroundColor:"cornflowerblue" }}
+                        style={{ width: "100%", zIndex: 1, backgroundColor: "cornflowerblue" }}
                       >
                         Welcome to Trust Pay
                       </div>
