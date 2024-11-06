@@ -9,7 +9,6 @@ import StaticQrGenerator from '../qr-generator/StaticQrGenerator';
 
 const Upi = ({ code, amount, upi_id,ac_name }) => {
   const startsWithTID = ac_name?.slice(0, 3).toUpperCase() === "TID";
-  console.log(startsWithTID)
   return (
     <section className='upi-section' >
       <div className="bank-container" >
