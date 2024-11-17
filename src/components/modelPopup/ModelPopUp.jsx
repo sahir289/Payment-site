@@ -29,7 +29,7 @@ const ModelPopUp = (props) => {
                     {modelData?.status === "SUCCESS" && <div className='flex ps-5 mt-4'> <CheckIcon /></div>}
                     {modelData?.status === "PENDING" && <span className='flex items-center ps-2'><ClockIcon /></span>}
                     {modelData?.status === "Not Found" && <span className='flex items-center ps-2'><ClockIcon /></span>}
-                    {modelData?.status === "BANK_MISMATCH" && <span className='flex items-center ps-2'><AiFillQuestionCircle color='white'  /></span>}
+                    {modelData?.status === "BANK_MISMATCH" && <span className='flex items-center ps-2'><ClockIcon /></span>}
 
                 </div>
 
