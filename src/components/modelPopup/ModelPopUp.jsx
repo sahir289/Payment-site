@@ -29,7 +29,7 @@ const ModelPopUp = (props) => {
                     {modelData?.status === "SUCCESS" && <div className='flex ps-5 mt-4'> <CheckIcon /></div>}
                     {modelData?.status === "PENDING" && <span className='flex items-center ps-2'><ClockIcon /></span>}
                     {modelData?.status === "Not Found" && <span className='flex items-center ps-2'><ClockIcon /></span>}
-                    {modelData?.status === "BANK_MISMATCH" && <span className='flex items-center ps-2'><ClockIcon /></span>}
+                    {modelData?.status === "BANK_MISMATCH" && <span className='flex items-center ps-2'><AiFillQuestionCircle color='white'  /></span>}
 
                 </div>
 
@@ -39,16 +39,16 @@ const ModelPopUp = (props) => {
                     {modelData?.status === "SUCCESS" && "Payment completed"}
                     {modelData?.status === "PENDING" && "UTR Submitted!!!"}
                     {modelData?.status === "Not Found" && "UTR Submitted!!!"}
-                    {modelData?.status === "DUPLICATE" && "UTR Submitted!!!"}
-                    {modelData?.status === "DISPUTE" && "UTR Submitted!!!"}
-                    {modelData?.status === "BANK_MISMATCH" && "UTR Submitted!!!"}
+                    {modelData?.status === "DUPLICATE" && "Duplicate UTR found!!!"}
+                    {modelData?.status === "DISPUTE" && "There is an Dispute in payment"}
+                    {modelData?.status === "BANK_MISMATCH" && "Bank Mismatch!!!"}
                 </p>
             </div>
             {modelData?.status === "PENDING" && <div className='text-center'>Your points will be credited soon</div>}
             {modelData?.status === "Not Found" && <div className='text-center'>Your points will be credited soon</div>}
-            {modelData?.status === "DUPLICATE" && <div className='text-center'>Your points will be credited soon</div>}
-            {modelData?.status === "DISPUTE" && <div className='text-center'>Your points will be credited soon</div>}
-            {modelData?.status === "BANK_MISMATCH" && <div className='text-center'>Your points will be credited soon</div>}
+            {modelData?.status === "DUPLICATE" && <div className='text-center text-red-600 '>Please contact to customer services for further info.</div>}
+            {modelData?.status === "DISPUTE" && <div className='text-center text-red-600 '>Please contact to customer services for further info.</div>}
+            {modelData?.status === "BANK_MISMATCH" && <div className='text-center text-red-600 '>Please contact to customer services for further info.</div>}
 
             <div className='mt-5'>
                 <div className='flex justify-between'>
