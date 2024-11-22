@@ -334,10 +334,6 @@ const Transactions = () => {
                               required: true,
                               message: "Please enter UTR no",
                             },
-                            {
-                              pattern: /^\d{12}$/,
-                              message: "UTR number must be exactly 12 digits",
-                            },
                           ]}
                         >
                           <Input type="text" size="middle" maxLength={12} />
