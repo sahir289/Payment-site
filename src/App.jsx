@@ -7,7 +7,6 @@ import React, { Suspense } from 'react';
 const Transactions = React.lazy(() => import('./screens/transactions/Transactions'));
 // const Test = React.lazy(() => import('./components/testingComp/Test'));
 // const WebSockets = React.lazy(() => import('./components/webSockets/WebSockets'));
-console.log("payment");
 
 function App() {
   return (
