@@ -336,7 +336,7 @@ const Transactions = () => {
                             },
                           ]}
                         >
-                          <Input type="text" size="middle" maxLength={12} />
+                          <Input type="text" size="middle" />
                         </Form.Item>
                         <Form.Item name="" label=" ">
                           <Button
