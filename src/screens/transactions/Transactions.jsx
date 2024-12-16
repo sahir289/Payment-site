@@ -19,6 +19,7 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const [amountLoading, setAmountLoading] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [locatioVPNError, setLocatioVPNError] = useState(false);
 
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState("0.0");
@@ -112,9 +113,10 @@ const Transactions = () => {
     const res = await userAPI.validateToken(token);
     setLoading(false);
     if (res.error) {
+      setLocatioVPNError(true);
       setStatus({
         status: res.error?.error?.status || "error",
-        message: res.error.message,
+        message: res.error.error,
       });
       return;
     }
@@ -272,10 +274,13 @@ const Transactions = () => {
           {status !== null ? (
             <>
               <ErrorImg />
-              <div className="font-serif text-2xl bg-blue-400 p-6 font-semibold rounded-lg mt-2">
+              {locatioVPNError && (<div className="font-serif text-2xl bg-blue-400 p-6 font-semibold rounded-lg mt-2">
+                <p>{status?.message}</p>
+              </div>)}
+              {!locatioVPNError && (<div className="font-serif text-2xl bg-blue-400 p-6 font-semibold rounded-lg mt-2">
                 <p className="">Status : {status?.status}</p>
                 <p>Message: {status?.message}</p>
-              </div>
+              </div>)}
             </>
           ) : (
             <>
