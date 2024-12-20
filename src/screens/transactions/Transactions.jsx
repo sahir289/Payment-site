@@ -142,7 +142,7 @@ const Transactions = () => {
 
   const handleUtrNumber = async (data) => {
     const updateData = {
-      usrSubmittedUtr: data?.utrNumber,
+      usrSubmittedUtr: data?.utrNumber?.trim(),
       code: transactionsInformation?.code,
       amount,
     };
