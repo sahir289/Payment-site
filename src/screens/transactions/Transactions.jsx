@@ -342,16 +342,16 @@ const Transactions = () => {
                           ]}
                         >
                           <Input type="text" size="middle"
-                                onKeyDown={(e) => {
-                                  if (e.key === " ") {
-                                    e.preventDefault(); // Prevent space key
-                                  }
-                                }}
-                                onChange={(e) => {
-                                  // Remove spaces if pasted or typed
-                                  e.target.value = e.target.value.replace(/\s+/g, "");
-                                }}
-                              />
+                            onKeyDown={(e) => {
+                              if (e.key === " ") {
+                                e.preventDefault(); // Prevent space key
+                              }
+                            }}
+                            onChange={(e) => {
+                              // Remove spaces if pasted or typed
+                              e.target.value = e.target.value.replace(/\s+/g, "");
+                            }}
+                          />
                         </Form.Item>
                         <Form.Item name="" label=" ">
                           <Button
