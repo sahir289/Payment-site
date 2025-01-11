@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Spin, Tabs, Modal, Form, Input, Button, notification, Upload } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { FcRating } from "react-icons/fc";
-import { Upi, Bank } from "../../components";
+import { Upi, Bank, Intent } from "../../components";
 import { useParams } from "react-router-dom";
 import { userAPI } from "../../services";
 import ModelPopUp from "../../components/modelPopup/ModelPopUp";
@@ -31,6 +31,8 @@ const Transactions = () => {
   const [redirected, setRedirected] = useState(false);
   const isQr = !transactionsInformation || transactionsInformation.is_qr;
   const isBank = !transactionsInformation || transactionsInformation.is_bank;
+  const allow_intent = !transactionsInformation || transactionsInformation.allow_intent;
+  const allow_merchant_intent = !transactionsInformation || transactionsInformation.allow_merchant_intent;
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
@@ -309,18 +311,23 @@ const Transactions = () => {
                     tabBarGutter={5}
                     style={{ marginTop: "-10px" }}
                   >
-                    {isQr && (
+                    {(isQr && !allow_intent) && (
                       <Tabs.TabPane tab="UPI" key="1">
                         <Upi {...transactionsInformation} amount={amount} />
                       </Tabs.TabPane>
                     )}
-                    {isBank && (
-                      <Tabs.TabPane tab="Bank Transfer" key="3">
+                    {(isBank && !allow_intent) && (
+                      <Tabs.TabPane tab="Bank Transfer" key="2">
                         <Bank {...transactionsInformation} amount={amount} />
                       </Tabs.TabPane>
                     )}
+                    {(allow_intent && allow_merchant_intent) && (
+                      <Tabs.TabPane tab="UPI" key="3">
+                        <Intent {...transactionsInformation} amount={amount} />
+                      </Tabs.TabPane>
+                    )}
                   </Tabs>
-                  <Tabs
+                  {!allow_intent && <Tabs
                     defaultActiveKey="1"
                     className="bottom-tabs mt-[-18px]"
                     type="card"
@@ -406,7 +413,7 @@ const Transactions = () => {
                         </Form.Item>
                       </Form>
                     </Tabs.TabPane>
-                  </Tabs>
+                  </Tabs>}
                   <div className="certi-bg rounded-lg shadow-md mx-auto w-full font-serif">
                     <div className="flex justify-center space-x-4">
                       <img
