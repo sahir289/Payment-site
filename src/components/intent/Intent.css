@@ -1,4 +1,4 @@
-.bank-container {
+.intent-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -68,7 +68,7 @@
     color: grey;
   }
   
-  .details-section {
+  .intent-details-section {
     display: flex;
     justify-content: center;
     align-items: center;
