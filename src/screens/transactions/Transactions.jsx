@@ -311,12 +311,12 @@ const Transactions = () => {
                     tabBarGutter={5}
                     style={{ marginTop: "-10px" }}
                   >
-                    {(isQr && !allow_intent) && (
+                    {(isQr && (!allow_intent || !allow_merchant_intent)) && (
                       <Tabs.TabPane tab="UPI" key="1">
                         <Upi {...transactionsInformation} amount={amount} />
                       </Tabs.TabPane>
                     )}
-                    {(isBank && !allow_intent) && (
+                    {(isBank && (!allow_intent || !allow_merchant_intent)) && (
                       <Tabs.TabPane tab="Bank Transfer" key="2">
                         <Bank {...transactionsInformation} amount={amount} />
                       </Tabs.TabPane>
