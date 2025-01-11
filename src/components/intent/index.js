@@ -1,2 +1,2 @@
-import Intent from './intent';
+import Intent from './Intent';
 export {Intent}
