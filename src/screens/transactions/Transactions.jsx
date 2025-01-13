@@ -577,7 +577,7 @@ const Transactions = () => {
                       </Form.Item>
                       <Button
                         type="primary"
-                        className="text-black"
+                        // className="text-black"
                         htmlType="submit"
                         loading={amountLoading}
                       >
