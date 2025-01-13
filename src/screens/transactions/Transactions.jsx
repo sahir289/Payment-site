@@ -25,14 +25,15 @@ const Transactions = () => {
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
+  const [paymentURL, setPaymentURL] = useState(null);
   const [status, setStatus] = useState(null);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});
   const [redirected, setRedirected] = useState(false);
-  const isQr = !transactionsInformation || transactionsInformation.is_qr;
-  const isBank = !transactionsInformation || transactionsInformation.is_bank;
-  const allow_intent = !transactionsInformation || transactionsInformation.allow_intent;
-  const allow_merchant_intent = !transactionsInformation || transactionsInformation.allow_merchant_intent;
+  const [isQr, setIsQr] = useState(false);
+  const [isBank, setIsBank] = useState(false);
+  const [allow_intent, setAllowIntent] = useState(false);
+  const [allow_merchant_intent, setAllowMerchantIntent] = useState(false);
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
@@ -91,7 +92,7 @@ const Transactions = () => {
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
-    // res.data.data.amount = 5000000;
+    // res.data.data.amount = 500;
     if (res?.data?.data?.status === "SUCCESS") {
       setPaymentModel(true);
       setModelData(res?.data?.data);
@@ -135,6 +136,7 @@ const Transactions = () => {
       expireTime = data.expiryTime * 1000;
       setTimerSeconds();
     }
+    // data.amount = 500;
     if (Number(data?.amount) > 0) {
       handleAmount(data);
       return;
@@ -214,6 +216,16 @@ const Transactions = () => {
 
     if (res.data.statusCode === 201) {
       setTransactionInformation(bankData);
+      setIsQr(bankData.is_qr);
+      setIsBank(bankData.is_bank);
+      setAllowIntent(bankData.allow_intent);
+      setAllowMerchantIntent(bankData.allow_merchant_intent);
+      if (bankData.allow_intent && bankData.allow_merchant_intent) {
+        const intentRes = await userAPI.generateIntentOrder(token, { amount });
+        if (intentRes?.data?.statusCode === 200) {
+          setPaymentURL(intentRes?.data?.data?.data?.payload)
+        }
+      }
     }
 
     setIsModalOpen(false);
@@ -322,12 +334,12 @@ const Transactions = () => {
                       </Tabs.TabPane>
                     )}
                     {(allow_intent && allow_merchant_intent) && (
-                      <Tabs.TabPane tab="UPI" key="3">
-                        <Intent {...transactionsInformation} amount={amount} />
+                      <Tabs.TabPane tab="UPI Intent" key="3">
+                        <Intent {...transactionsInformation} amount={amount} paymentURL={paymentURL} />
                       </Tabs.TabPane>
                     )}
                   </Tabs>
-                  {!allow_intent && <Tabs
+                  {(!allow_intent || !allow_merchant_intent) && (isQr || isBank) && <Tabs
                     defaultActiveKey="1"
                     className="bottom-tabs mt-[-18px]"
                     type="card"
@@ -414,110 +426,112 @@ const Transactions = () => {
                       </Form>
                     </Tabs.TabPane>
                   </Tabs>}
-                  <div className="certi-bg rounded-lg shadow-md mx-auto w-full font-serif">
-                    <div className="flex justify-center space-x-4">
-                      <img
-                        src={norton}
-                        alt="Norton Certification"
-                        className="w-24 h-24 object-contain rounded-md"
-                      />
-                      <img
-                        src={pcicertificate}
-                        alt="PCI Certificate"
-                        className="w-24 h-24 object-contain rounded-md"
-                      />
+                  {(allow_intent || allow_merchant_intent || isQr || isBank) && <>
+                    <div className="certi-bg rounded-lg shadow-md mx-auto w-full font-serif">
+                      <div className="flex justify-center space-x-4">
+                        <img
+                          src={norton}
+                          alt="Norton Certification"
+                          className="w-24 h-24 object-contain rounded-md"
+                        />
+                        <img
+                          src={pcicertificate}
+                          alt="PCI Certificate"
+                          className="w-24 h-24 object-contain rounded-md"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="bg-white rounded-lg shadow-md mx-auto w-full font-sans">
-                    <div className="border-t border-gray-200 pt-2 text-center" style={{ backgroundColor: "cornflowerblue", borderRadius: "10px" }}>
-                      <h2 className="text-black font-semibold mb-2">
-                        {!showVideo && (
+                    <div className="bg-white rounded-lg shadow-md mx-auto w-full font-sans">
+                      <div className="border-t border-gray-200 pt-2 text-center" style={{ backgroundColor: "cornflowerblue", borderRadius: "10px" }}>
+                        <h2 className="text-black font-semibold mb-2">
+                          {!showVideo && (
+                            <a
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setShowVideo(true); // Show the video when clicked
+                              }}
+                              className="text-black font-medium hover:underline"
+                            >
+                              Watch a video for Quick Deposit instructions:
+                            </a>
+                          )}
+                        </h2>
+
+                        {/* Video Section with Close Button */}
+                        {showVideo && (
+                          <div
+                            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-lg shadow-lg overflow-hidden"
+                            style={{
+                              width: "40%",
+                              maxWidth: "600px",
+                              paddingBottom: "30.25%",
+                            }}
+                          >
+                            <iframe
+                              src={videoUrl}
+                              title="Quick Deposit Instructions"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="absolute top-0 left-0 w-full h-full"
+                            ></iframe>
+                            <button
+                              onClick={() => setShowVideo(false)}
+                              className="absolute top-2 right-2 text-black bg-gray-300 rounded-full p-1 hover:bg-gray-400"
+                              aria-label="Close video"
+                            >
+                              &times; {/* Close icon (X) */}
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Language Links */}
+                        <div className="space-y-2 mt-2">
                           <a
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              setShowVideo(true); // Show the video when clicked
+                              setShowVideo(true); // Show the video when a language link is clicked
                             }}
                             className="text-black font-medium hover:underline"
                           >
-                            Watch a video for Quick Deposit instructions:
+                            Telugu -
                           </a>
-                        )}
-                      </h2>
-
-                      {/* Video Section with Close Button */}
-                      {showVideo && (
-                        <div
-                          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-lg shadow-lg overflow-hidden"
-                          style={{
-                            width: "40%",
-                            maxWidth: "600px",
-                            paddingBottom: "30.25%",
-                          }}
-                        >
-                          <iframe
-                            src={videoUrl}
-                            title="Quick Deposit Instructions"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="absolute top-0 left-0 w-full h-full"
-                          ></iframe>
-                          <button
-                            onClick={() => setShowVideo(false)}
-                            className="absolute top-2 right-2 text-black bg-gray-300 rounded-full p-1 hover:bg-gray-400"
-                            aria-label="Close video"
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowVideo(true); // Show the video when a language link is clicked
+                            }}
+                            className="text-black font-medium hover:underline"
                           >
-                            &times; {/* Close icon (X) */}
-                          </button>
+                            Hindi -
+                          </a>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowVideo(true); // Show the video when a language link is clicked
+                            }}
+                            className="text-black font-medium hover:underline"
+                          >
+                            Tamil -
+                          </a>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowVideo(true); // Show the video when a language link is clicked
+                            }}
+                            className="text-black font-medium hover:underline"
+                          >
+                            English
+                          </a>
                         </div>
-                      )}
-
-                      {/* Language Links */}
-                      <div className="space-y-2 mt-2">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowVideo(true); // Show the video when a language link is clicked
-                          }}
-                          className="text-black font-medium hover:underline"
-                        >
-                          Telugu -
-                        </a>
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowVideo(true); // Show the video when a language link is clicked
-                          }}
-                          className="text-black font-medium hover:underline"
-                        >
-                          Hindi -
-                        </a>
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowVideo(true); // Show the video when a language link is clicked
-                          }}
-                          className="text-black font-medium hover:underline"
-                        >
-                          Tamil -
-                        </a>
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowVideo(true); // Show the video when a language link is clicked
-                          }}
-                          className="text-black font-medium hover:underline"
-                        >
-                          English
-                        </a>
                       </div>
                     </div>
-                  </div>
+                  </>}
                 </div>
 
                 <Modal
