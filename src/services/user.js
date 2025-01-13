@@ -45,3 +45,7 @@ export const processTransaction = async (token, data) => {
 export const payInOneTimeExpireURL = async (token) => {
     return await APIParser(http.post(`/expire-one-time-payin-url/${token}`));
 }
+
+export const generateIntentOrder = async (token, data) => {
+    return await APIParser(http.post(`/generate-intent-order/${token}`, data));
+}
