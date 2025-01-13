@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { MdOutlineTimer } from "react-icons/md";
 import { Divider, Button, message, Modal, Form, Input } from 'antd';
 import "./Intent.css"
@@ -22,14 +22,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     const [open, setOpen] = useState(false);
     // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
     const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
-    console.log(razorpay);
     const [cashFree, setCashFee] = useState(false);
 
     useEffect(() => {
         const randomBoolean = Math.random() < 0.5;
         setCashFee(randomBoolean);
     }, []);
-    console.log(cashFree)
     const handleIntentPay = async (type) => {
         try {
             if (loading) {
