@@ -22,6 +22,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     const [open, setOpen] = useState(false);
     // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
     const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
+    console.log(razorpay);
     const [cashFree, setCashFee] = useState(true);
 
     useEffect(() => {
@@ -104,7 +105,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                         <Input />
                     </Form.Item>
                     <div className='flex justify-end'>
-                        <Button type='primary' className='!bg-[#000000]' htmlType='submit'>
+                        <Button type='primary' htmlType='submit'>
                             Proceed
                         </Button>
                     </div>
