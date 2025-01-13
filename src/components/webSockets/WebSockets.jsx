@@ -6,18 +6,18 @@ export const socket = io(`${import.meta.env.VITE_API_WS_URL}`);
 const WebSockets = ({checkPaymentStatusHandler}) => {
   useEffect(() => {
     socket.on('connect', () => {
-      console.log('Connected to the server');
+      // console.log('Connected to the server');
     });
     
     socket.on('new-entry', (data) => {
-      console.log('New entry received:', data);
+      // console.log('New entry received:', data);
       // Handle the new entry data
       // fetchUsersData()
       checkPaymentStatusHandler()
     });
 
     socket.on('disconnect', () => {
-      console.log('Disconnected from the server');
+      // console.log('Disconnected from the server');
     });
 
     // Cleanup on component unmount
