@@ -25,10 +25,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     console.log(razorpay);
     const [cashFree, setCashFee] = useState(true);
 
-    // useEffect(() => {
-    //     const randomBoolean = Math.random() < 0.5;
-    //     setCashFee(randomBoolean);
-    // }, []);
+    useEffect(() => {
+        const randomBoolean = Math.random() < 0.5;
+        setCashFee(randomBoolean);
+    }, []);
     const handleIntentPay = async (type) => {
         try {
             if (loading) {
