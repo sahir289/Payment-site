@@ -25,7 +25,7 @@ const Transactions = () => {
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
-  const [paymentURL, setPaymentURL] = useState(null);
+  const [paymentURL, setPaymentURL] = useState({});
   const [status, setStatus] = useState(null);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});

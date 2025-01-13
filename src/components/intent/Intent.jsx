@@ -3,10 +3,7 @@ import { MdOutlineTimer } from "react-icons/md";
 import { Divider, Button, message, Modal, Form, Input } from 'antd';
 import "./Intent.css"
 
-const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, setStatus, ...props }) => {
-    const handleIntentUPIPayment = (gateWay) => {
-        window.open(gateWay, '_blank');
-    }
+const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name, setStatus, ...props }) => {
 
     const types = {
         G_PAY: 'gpay',
@@ -14,17 +11,34 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
         PAY_TM: 'paytm',
         BHIM: 'bhim',
     }
+    const gateWayURLs = {
+        [types.G_PAY]: paymentURL.gpay,
+        [types.PHONE_PE]: paymentURL.phonepe,
+        [types.PAY_TM]: paymentURL.paytm,
+        [types.BHIM]: paymentURL.bhim,
+    }
 
     const [loading, setLoading] = useState("");
     const [open, setOpen] = useState(false);
     // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
-    const razorpay = new Razorpay({  key: import.meta.env.VITE_RAZOR_PAY_ID });
+    const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
+    const [cashFree, setCashFee] = useState(true);
+
+    useEffect(() => {
+        const randomBoolean = Math.random() < 0.5;
+        setCashFee(randomBoolean);
+    }, []);
     const handleIntentPay = async (type) => {
         try {
-            if(loading){
+            if (loading) {
                 return;
             }
             setLoading(type);
+            if (cashFree) {
+                window.open(gateWayURLs[type], '_blank');
+                setLoading("");
+                return
+            }
             await razorpay.checkPaymentAdapter(type);
             setOpen(true);
         } catch (err) {
@@ -37,7 +51,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
     const processPayment = async (data = {}) => {
         setOpen(false)
         try {
-            if(!loading){
+            if (!loading) {
                 message.error('Please try again!');
                 return;
             }
@@ -55,7 +69,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
                 .on('payment.error', function (error) {
                     setLoading("");
                     handleUpdateTransactionStatus(error?.error?.description || "Unable to to charge, payment has been cancelled");
-                    if(error.error && error.error.description){
+                    if (error.error && error.error.description) {
                         message.error(error.error.description);
                     }
                 })
@@ -67,8 +81,8 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
         }
     }
 
-    const handleUpdateTransactionStatus = async (error = null)=>{
-        if(error){
+    const handleUpdateTransactionStatus = async (error = null) => {
+        if (error) {
             setStatus({
                 status: "402",
                 message: error,
@@ -113,7 +127,9 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
                     <Button
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
                         className='text-xl'
-                        onClick={()=>{handleIntentPay(types.G_PAY);handleIntentUPIPayment(paymentURL.gpay);}}
+                        onClick={() => { 
+                            handleIntentPay(types.G_PAY);
+                        }}
                         loading={loading === types.G_PAY}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
@@ -121,9 +137,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
                         </svg>
                         Google Pay
                     </Button>
-                    <Button 
-                        className='ml-3 text-xl' 
-                        onClick={()=>{handleIntentPay(types.PHONE_PE);() => handleIntentUPIPayment(paymentURL.phonepe);}}
+                    <Button
+                        className='ml-3 text-xl'
+                        style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
+                        onClick={() => { 
+                            handleIntentPay(types.PHONE_PE);
+                        }}
                         loading={loading === types.PHONE_PE}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
@@ -133,10 +152,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
                     </Button>
                 </div>
                 <div className="intent-details-section mt-5" style={{ height: "100px" }}>
-                    <Button 
-                        style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }} 
+                    <Button
+                        style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
                         className='text-xl'
-                        onClick={()=>{handleIntentPay(types.PAY_TM);() => handleIntentUPIPayment(paymentURL.paytm);}}
+                        onClick={() => { 
+                            handleIntentPay(types.PAY_TM); 
+                        }}
                         loading={loading === types.PAY_TM}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
@@ -144,10 +165,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL,  name, se
                         </svg>
                         Paytm
                     </Button>
-                    <Button 
-                        className='ml-3 text-xl' 
+                    <Button
+                        className='ml-3 text-xl'
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
-                        onClick={()=>{handleIntentPay(types.BHIM);() => handleIntentUPIPayment(paymentURL.bhim);}}
+                        onClick={() => { 
+                            handleIntentPay(types.BHIM);
+                        }}
                         loading={loading === types.BHIM}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" viewBox="0 0 48 48">
