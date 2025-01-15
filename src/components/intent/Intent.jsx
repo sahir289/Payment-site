@@ -50,10 +50,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
 
     const processPayment = async () => {
         try {
-            if (!loading) {
-                message.error('Please try again!');
-                return;
-            }
+            // if (!loading) {
+            //     message.error('Please try again!');
+            //     return;
+            // }
             var paymentData = {
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
                 method: 'upi',
