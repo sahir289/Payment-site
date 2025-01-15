@@ -39,7 +39,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 setLoading("");
                 return
             }
-            // await razorpay.checkPaymentAdapter(type);
+            await razorpay.checkPaymentAdapter(type);
             await processPayment(type);
         } catch (err) {
             setLoading("");
