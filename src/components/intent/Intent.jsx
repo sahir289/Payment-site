@@ -23,10 +23,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
     const [cashFree, setCashFee] = useState(false);
 
-    useEffect(() => {
-        const randomBoolean = Math.random() < 0.5;
-        setCashFee(randomBoolean);
-    }, []);
+    // useEffect(() => {
+    //     const randomBoolean = Math.random() < 0.5;
+    //     setCashFee(randomBoolean);
+    // }, []);
     
     const handleIntentPay = async (type) => {
         try {
