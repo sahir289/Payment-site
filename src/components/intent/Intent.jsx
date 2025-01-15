@@ -19,7 +19,6 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     }
 
     const [loading, setLoading] = useState("");
-    const [open, setOpen] = useState(false);
     // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
     const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
     const [cashFree, setCashFee] = useState(false);
@@ -28,6 +27,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         const randomBoolean = Math.random() < 0.5;
         setCashFee(randomBoolean);
     }, []);
+    
     const handleIntentPay = async (type) => {
         try {
             if (loading) {
@@ -40,7 +40,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 return
             }
             await razorpay.checkPaymentAdapter(type);
-            setOpen(true);
+            await processPayment();
         } catch (err) {
             setLoading("");
             console.error(err);
@@ -48,27 +48,28 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         }
     }
 
-    const processPayment = async (data = {}) => {
-        setOpen(false)
+    const processPayment = async () => {
         try {
             if (!loading) {
                 message.error('Please try again!');
                 return;
             }
             var paymentData = {
-                amount: amount * 100, // need to multiply with 100 becaus amount here in 'paisa'
+                amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
                 method: 'upi',
                 currency: "INR",
-                ...data,
+                email: `john1${Math.floor(Math.random() * 1009)}@gmail.com`,
+                contact: props.id,
             };
             razorpay.createPayment(paymentData, { [loading]: true })
                 .on('payment.success', function (response) {
+                    console.log(response);
                     setLoading("");
-                    handleUpdateTransactionStatus();
+                    handleUpdateTransactionStatus("200", JSON.stringify(response));
                 })
                 .on('payment.error', function (error) {
                     setLoading("");
-                    handleUpdateTransactionStatus(error?.error?.description || "Unable to to charge, payment has been cancelled");
+                    handleUpdateTransactionStatus("402", error?.error?.description || "Unable to to charge, payment has been cancelled");
                     if (error.error && error.error.description) {
                         message.error(error.error.description);
                     }
@@ -78,38 +79,19 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
             console.log(err);
             message.error('Error while processing payment!');
             setLoading("");
+            handleUpdateTransactionStatus("500", err.message);
         }
     }
 
-    const handleUpdateTransactionStatus = async (error = null) => {
-        if (error) {
-            setStatus({
-                status: "402",
-                message: error,
-            });
-            return;
-        }
-
-        // processTransaction
+    const handleUpdateTransactionStatus = async (status, message) => {
+        setStatus({
+            status,
+            message,
+        });
     }
 
     return (
         <section>
-            <Modal open={open} closable={false} footer={null} centered>
-                <Form onFinish={processPayment} layout='vertical'>
-                    <Form.Item name='email' label='Email' rules={[{ required: true, message: '${label} is required!' }]}>
-                        <Input type='email' />
-                    </Form.Item>
-                    <Form.Item name='contact' label='Phone' rules={[{ required: true, message: '${label} is required!' }]}>
-                        <Input />
-                    </Form.Item>
-                    <div className='flex justify-end'>
-                        <Button type='primary' htmlType='submit'>
-                            Proceed
-                        </Button>
-                    </div>
-                </Form>
-            </Modal>
             <div className="intent-container">
                 <p className="text">Payment Time Left</p>
                 <div className="right-area">
@@ -127,7 +109,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                     <Button
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
                         className='text-xl'
-                        onClick={() => { 
+                        onClick={() => {
                             handleIntentPay(types.G_PAY);
                         }}
                         loading={loading === types.G_PAY}
@@ -140,7 +122,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                     <Button
                         className='ml-3 text-xl'
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
-                        onClick={() => { 
+                        onClick={() => {
                             handleIntentPay(types.PHONE_PE);
                         }}
                         loading={loading === types.PHONE_PE}
@@ -155,8 +137,8 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                     <Button
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
                         className='text-xl'
-                        onClick={() => { 
-                            handleIntentPay(types.PAY_TM); 
+                        onClick={() => {
+                            handleIntentPay(types.PAY_TM);
                         }}
                         loading={loading === types.PAY_TM}
                     >
@@ -168,7 +150,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                     <Button
                         className='ml-3 text-xl'
                         style={{ height: "60px", backgroundColor: "rgb(250, 250, 242)", border: "none" }}
-                        onClick={() => { 
+                        onClick={() => {
                             handleIntentPay(types.BHIM);
                         }}
                         loading={loading === types.BHIM}
