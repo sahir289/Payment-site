@@ -3,7 +3,7 @@ import { MdOutlineTimer } from "react-icons/md";
 import { Divider, Button, message, Modal, Form, Input } from 'antd';
 import "./Intent.css"
 
-const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name, setStatus, ...props }) => {
+const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name, sno, setStatus, ...props }) => {
 
     const types = {
         G_PAY: 'gpay',
@@ -39,8 +39,8 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 setLoading("");
                 return
             }
-            await razorpay.checkPaymentAdapter(type);
-            await processPayment();
+            // await razorpay.checkPaymentAdapter(type);
+            await processPayment(type);
         } catch (err) {
             setLoading("");
             console.error(err);
@@ -48,20 +48,16 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         }
     }
 
-    const processPayment = async () => {
+    const processPayment = async (type) => {
         try {
-            // if (!loading) {
-            //     message.error('Please try again!');
-            //     return;
-            // }
             var paymentData = {
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
                 method: 'upi',
                 currency: "INR",
-                email: `john1${Math.floor(Math.random() * 1009)}@gmail.com`,
-                contact: props.id,
+                email: `${sno}.trustpay@gmail.com`,
+                contact:  "1".repeat(8),
             };
-            razorpay.createPayment(paymentData, { [loading]: true })
+            razorpay.createPayment(paymentData, { [type]: true })
                 .on('payment.success', function (response) {
                     console.log(response);
                     setLoading("");
