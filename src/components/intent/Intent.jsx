@@ -60,8 +60,9 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
             razorpay.createPayment(paymentData, { [type]: true })
                 .on('payment.success', function (response) {
                     console.log(response);
+                    const message = "Transaction Success"
                     setLoading("");
-                    handleUpdateTransactionStatus("200", {message: "Transaction Success"});
+                    handleUpdateTransactionStatus("200", message);
                 })
                 .on('payment.error', function (error) {
                     setLoading("");
