@@ -61,7 +61,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 .on('payment.success', function (response) {
                     console.log(response);
                     setLoading("");
-                    handleUpdateTransactionStatus("200", {status: "Transaction Success"});
+                    handleUpdateTransactionStatus("200", {message: "Transaction Success"});
                 })
                 .on('payment.error', function (error) {
                     setLoading("");
