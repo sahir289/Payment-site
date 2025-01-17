@@ -50,7 +50,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
 
     const processPayment = async (type) => {
         try {
-            var paymentData = {
+            let paymentData = {
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
                 method: 'upi',
                 currency: "INR",
@@ -60,12 +60,14 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
             razorpay.createPayment(paymentData, { [type]: true })
                 .on('payment.success', function (response) {
                     console.log(response);
-                    const message = {
-                        status: 200,
-                        message: "Transaction Success"
-                    } 
+                    const newResponse = {
+                        status : 'SUCCESS',
+                        message : "Transaction success",
+                        amount: paymentData.amount,
+                        intent: true
+                    }
                     setLoading("");
-                    handleUpdateTransactionStatus("200", message);
+                    handleUpdateTransactionStatus("200", JSON.stringify(newResponse));
                 })
                 .on('payment.error', function (error) {
                     setLoading("");
