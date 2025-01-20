@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { MdOutlineTimer } from "react-icons/md";
 import { Divider, Button, message, Modal, Form, Input } from 'antd';
+import { userAPI } from '../../services';
+import { useParams } from 'react-router-dom';
 import "./Intent.css"
 
 const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name, sno, setStatus, ...props }) => {
@@ -18,16 +20,20 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         [types.BHIM]: paymentURL.bhim,
     }
 
+    const params = useParams();
     const [loading, setLoading] = useState("");
     // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
+    const [cashFree, setCashFee] = useState(true);
     const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
-    const [cashFree, setCashFee] = useState(false);
+    const cashfree_ = Cashfree({
+        "mode": "sandbox"
+    });
 
-    // useEffect(() => {
-    //     const randomBoolean = Math.random() < 0.5;
-    //     setCashFee(randomBoolean);
-    // }, []);
-    
+    useEffect(() => {
+        // const randomBoolean = Math.random() < 0.5;
+        // setCashFee(randomBoolean);
+    }, []);
+
     const handleIntentPay = async (type) => {
         try {
             if (loading) {
@@ -35,11 +41,20 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
             }
             setLoading(type);
             if (cashFree) {
-                window.open(gateWayURLs[type], '_blank');
+                const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
+                if (intentRes.error) {
+                    return;
+                }
+                const sessionId = intentRes.data.data.payment_session_id;
+                cashfree_.checkout({
+                    paymentSessionId: sessionId,
+                    redirectTarget: "_modal"
+                });
+                // window.open(gateWayURLs[type], '_blank');
                 setLoading("");
                 return
             }
-            if(type === types.G_PAY){
+            if (type === types.G_PAY) {
                 await razorpay.checkPaymentAdapter(type);
             }
             await processPayment(type);
@@ -57,14 +72,14 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 method: 'upi',
                 currency: "INR",
                 email: `${sno}.trustpay@gmail.com`,
-                contact:  "1".repeat(8),
+                contact: "1".repeat(8),
             };
             razorpay.createPayment(paymentData, { [type]: true })
                 .on('payment.success', function (response) {
                     console.log(response);
                     const newResponse = {
-                        status : 'SUCCESS',
-                        message : "Transaction success",
+                        status: 'SUCCESS',
+                        message: "Transaction success",
                         amount: paymentData.amount,
                         intent: true
                     }
