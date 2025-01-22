@@ -13,18 +13,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         PAY_TM: 'paytm',
         BHIM: 'bhim',
     }
-    const gateWayURLs = {
-        [types.G_PAY]: paymentURL.gpay,
-        [types.PHONE_PE]: paymentURL.phonepe,
-        [types.PAY_TM]: paymentURL.paytm,
-        [types.BHIM]: paymentURL.bhim,
-    }
 
     const params = useParams();
     const [loading, setLoading] = useState("");
-    // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
-    const [cashFree, setCashFee] = useState(true);
-    const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
+    const [cashFree, setCashFee] = useState(false);
     const cashfree_ = Cashfree({
         "mode": "sandbox"
     });
@@ -40,11 +32,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 return;
             }
             setLoading(type);
+            const intentRes = await userAPI.generateIntentOrder(params.token, { amount, isRazorpay: !cashFree });
+            if (intentRes.error) {
+                message.error(intentRes.error.message);
+                return;
+            }
             if (cashFree) {
-                const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
-                if (intentRes.error) {
-                    return;
-                }
                 const sessionId = intentRes.data.data.payment_session_id;
                 cashfree_.checkout({
                     paymentSessionId: sessionId,
@@ -54,28 +47,30 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 setLoading("");
                 return
             }
-            if (type === types.G_PAY) {
-                await razorpay.checkPaymentAdapter(type);
-            }
-            await processPayment(type);
+            await processPayment(intentRes.data.id);
         } catch (err) {
             setLoading("");
             console.error(err);
-            message.error(`${type} is not found on your device!`);
+            message.error(err.message);
         }
     }
 
-    const processPayment = async (type) => {
+    const processPayment = async (id) => {
         try {
             let paymentData = {
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
-                method: 'upi',
                 currency: "INR",
-                email: `${sno}.trustpay@gmail.com`,
-                contact: "1".repeat(8),
+                order_id: id,
+                name: "A2X Pay",
             };
-            razorpay.createPayment(paymentData, { [type]: true })
-                .on('payment.success', function (response) {
+            const razorpay = new Razorpay({ 
+                key: import.meta.env.VITE_RAZOR_PAY_ID,
+                amount: amount * 100,
+                currency: "INR",
+                ...paymentData,
+            });
+            razorpay.open();
+            razorpay.on('payment.success', function (response) {
                     console.log(response);
                     const newResponse = {
                         status: 'SUCCESS',
