@@ -21,7 +21,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
     const [redirected, setRedirected] = useState(false);
 
     const cashfree_ = Cashfree({
-        "mode": "sandbox"
+        "mode": "production"
     });
 
     // useEffect(() => {
@@ -35,12 +35,12 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 return;
             }
             setLoading(type);
-            const intentRes = await userAPI.generateIntentOrder(params.token, { amount, isRazorpay: !cashFree });
-            if (intentRes.error) {
-                message.error(intentRes.error.message);
-                return;
-            }
             if (cashFree) {
+                const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
+                if (intentRes.error) {
+                    message.error(intentRes.error.message);
+                    return;
+                }
                 const sessionId = intentRes.data.data.payment_session_id;
                 cashfree_.checkout({
                     paymentSessionId: sessionId,
@@ -50,7 +50,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 setLoading("");
                 return
             }
-            await processPayment(intentRes.data.id);
+            await processPayment();
         } catch (err) {
             setLoading("");
             console.error(err);
@@ -58,44 +58,26 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         }
     }
 
-    const processPayment = async (id) => {
+    const processPayment = async () => {
         try {
-            // if (!loading) {
-            //     message.error('Please try again!');
-            //     return;
-            // }
-            var paymentData = {
-                amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
-                currency: "INR",
-                order_id: id,
-                name: "A2X Pay",
-            };
-            const razorpay = new Razorpay({ 
+            const razorpay = new Razorpay({
                 key: import.meta.env.VITE_RAZOR_PAY_ID,
-                amount: amount * 100,
+                name: "A2X Pay",
                 currency: "INR",
-                ...paymentData,
+                amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
+                prefill: {
+                    contact: '911000000000',
+                },
+                handler: checkPaymentStatusHandler,
             });
+            razorpay.on('payment.failed', function (response) {
+                handleUpdateTransactionStatus("402", response?.error?.description || "Unable to to charge, payment has been cancelled");
+                if (response.error && response.error.description) {
+                    message.error(response.error.description);
+                }
+            })
             razorpay.open();
-            razorpay.on('payment.success', function (response) {
-                    console.log(response);
-                    const newResponse = {
-                        status: 'SUCCESS',
-                        message: "Transaction success",
-                        amount: paymentData.amount,
-                        intent: true
-                    }
-                    setLoading("");
-                    // handleUpdateTransactionStatus("200", JSON.stringify(response));
-                    checkPaymentStatusHandler()
-                })
-                .on('payment.error', function (error) {
-                    setLoading("");
-                    handleUpdateTransactionStatus("402", error?.error?.description || "Unable to to charge, payment has been cancelled");
-                    if (error.error && error.error.description) {
-                        message.error(error.error.description);
-                    }
-                })
+            setLoading("");
 
         } catch (err) {
             console.log(err);
