@@ -333,7 +333,7 @@ const Transactions = () => {
                     )}
                     {(allow_intent && allow_merchant_intent) && (
                       <Tabs.TabPane tab="UPI Intent" key="3">
-                        <Intent {...transactionsInformation} amount={amount} paymentURL={paymentURL} setStatus={setStatus} />
+                        <Intent {...transactionsInformation} amount={amount} paymentURL={paymentURL} params={params} setStatus={setStatus} />
                       </Tabs.TabPane>
                     )}
                   </Tabs>
