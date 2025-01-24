@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MdOutlineTimer } from "react-icons/md";
 import { Divider, Button, message } from 'antd';
 import { userAPI } from '../../services';
@@ -24,10 +24,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         "mode": "production"
     });
 
-    // useEffect(() => {
-    //     const randomBoolean = Math.random() < 0.5;
-    //     setCashFee(randomBoolean);
-    // }, []);
+    useEffect(() => {
+        const randomBoolean = Math.random() < 0.5;
+        setCashFee(randomBoolean);
+    }, []);
 
     const handleIntentPay = async (type) => {
         try {
@@ -65,10 +65,10 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 name: "A2X Pay",
                 currency: "INR",
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
-                notes: [{
+                notes: {
                     sno: props.sno,
                     id: props.id,
-                }],
+                },
                 prefill: {
                     contact: '911000000000',
                     email: `${props.sno}.trustpay@gmail.com`
