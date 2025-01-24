@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { MdOutlineTimer } from "react-icons/md";
-import { Divider, Button, message, Modal, Form, Input } from 'antd';
-import "./Intent.css"
-import ModelPopUp from '../modelPopup/ModelPopUp';
+import { Divider, Button, message } from 'antd';
 import { userAPI } from '../../services';
+import ModelPopUp from '../modelPopup/ModelPopUp';
+import "./Intent.css"
 
 const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name, params, setStatus, ...props }) => {
 
@@ -13,20 +13,16 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         PAY_TM: 'paytm',
         BHIM: 'bhim',
     }
-    const gateWayURLs = {
-        [types.G_PAY]: paymentURL.gpay,
-        [types.PHONE_PE]: paymentURL.phonepe,
-        [types.PAY_TM]: paymentURL.paytm,
-        [types.BHIM]: paymentURL.bhim,
-    }
 
     const [loading, setLoading] = useState("");
-    // console.log({ ac_name, ac_no, bank_name, ifsc, amount, name, ...props})
-    const razorpay = new Razorpay({ key: import.meta.env.VITE_RAZOR_PAY_ID });
     const [cashFree, setCashFee] = useState(false);
     const [paymentModel, setPaymentModel] = useState(false);
     const [modelData, setModelData] = useState({});
     const [redirected, setRedirected] = useState(false);
+
+    const cashfree_ = Cashfree({
+        "mode": "production"
+    });
 
     // useEffect(() => {
     //     const randomBoolean = Math.random() < 0.5;
@@ -40,46 +36,48 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
             }
             setLoading(type);
             if (cashFree) {
-                window.open(gateWayURLs[type], '_blank');
+                const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
+                if (intentRes.error) {
+                    message.error(intentRes.error.message);
+                    return;
+                }
+                const sessionId = intentRes.data.data.payment_session_id;
+                cashfree_.checkout({
+                    paymentSessionId: sessionId,
+                    redirectTarget: "_modal"
+                });
+                // window.open(gateWayURLs[type], '_blank');
                 setLoading("");
                 return
             }
-            await razorpay.checkPaymentAdapter(type);
             await processPayment();
         } catch (err) {
             setLoading("");
             console.error(err);
-            message.error(`${type} is not found on your device!`);
+            message.error(err.message);
         }
     }
 
     const processPayment = async () => {
         try {
-            // if (!loading) {
-            //     message.error('Please try again!');
-            //     return;
-            // }
-            var paymentData = {
-                amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
-                method: 'upi',
+            const razorpay = new Razorpay({
+                key: import.meta.env.VITE_RAZOR_PAY_ID,
+                name: "A2X Pay",
                 currency: "INR",
-                email: `john1${Math.floor(Math.random() * 1009)}@gmail.com`,
-                contact: props.id,
-            };
-            razorpay.createPayment(paymentData, { [loading]: true })
-                .on('payment.success', function (response) {
-                    console.log(response);
-                    setLoading("");
-                    // handleUpdateTransactionStatus("200", JSON.stringify(response));
-                    checkPaymentStatusHandler()
-                })
-                .on('payment.error', function (error) {
-                    setLoading("");
-                    handleUpdateTransactionStatus("402", error?.error?.description || "Unable to to charge, payment has been cancelled");
-                    if (error.error && error.error.description) {
-                        message.error(error.error.description);
-                    }
-                })
+                amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
+                prefill: {
+                    contact: '911000000000',
+                },
+                handler: checkPaymentStatusHandler,
+            });
+            razorpay.on('payment.failed', function (response) {
+                handleUpdateTransactionStatus("402", response?.error?.description || "Unable to to charge, payment has been cancelled");
+                if (response.error && response.error.description) {
+                    message.error(response.error.description);
+                }
+            })
+            razorpay.open();
+            setLoading("");
 
         } catch (err) {
             console.log(err);

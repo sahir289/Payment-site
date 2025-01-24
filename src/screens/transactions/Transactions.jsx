@@ -224,12 +224,6 @@ const Transactions = () => {
       setIsBank(bankData.is_bank);
       setAllowIntent(bankData.allow_intent);
       setAllowMerchantIntent(bankData.allow_merchant_intent);
-      // if (bankData.allow_intent && bankData.allow_merchant_intent) {
-      //   const intentRes = await userAPI.generateIntentOrder(token, { amount });
-      //   if (intentRes?.data?.statusCode === 200) {
-      //     setPaymentURL(intentRes?.data?.data?.data?.payload)
-      //   }
-      // }
     }
 
     setIsModalOpen(false);
