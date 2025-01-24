@@ -65,8 +65,13 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                 name: "A2X Pay",
                 currency: "INR",
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
+                notes: [{
+                    sno: props.sno,
+                    id: props.id,
+                }],
                 prefill: {
                     contact: '911000000000',
+                    email: `${props.sno}.trustpay@gmail.com`
                 },
                 handler: checkPaymentStatusHandler,
             });
