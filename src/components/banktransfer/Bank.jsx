@@ -19,7 +19,7 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
       </div>
       <div className="section-container">
         <div className="section-to text-sm">
-          <span><b>Please scan and pay the exact amount, then share the UTR for confirmation</b></span>
+          <span><b>Please pay the exact amount, then share the UTR for confirmation</b></span>
         </div>
         <Divider />
         <div className="amount-container">
