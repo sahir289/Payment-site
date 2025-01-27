@@ -12,6 +12,7 @@ import { useLocation } from "react-router-dom";
 import "./transactions.css";
 import pcicertificate from "../assets/pcicertificate.jpg";
 import norton from "../assets/norton.jpg";
+import { MdOutlineSupportAgent } from "react-icons/md";
 
 const Transactions = () => {
   const params = useParams();
@@ -20,7 +21,7 @@ const Transactions = () => {
   const [amountLoading, setAmountLoading] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [locatioVPNError, setLocatioVPNError] = useState(false);
-
+  const [toggleTNCModal, setTNCModal] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,7 +94,7 @@ const Transactions = () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
     // res.data.data.amount = 500;
-    if( status.intent === true){
+    if (status.intent === true) {
       setPaymentModel(true);
       setModelData(status);
     }
@@ -526,6 +527,22 @@ const Transactions = () => {
                           >
                             English
                           </a>
+                          <div className="flex justify-between">
+                            <div className="flex ml-2 mb-4">
+                              <button onClick={() => setTNCModal(true)}>
+                                Terms & Conditions <span className="text-red-500">*</span>
+                              </button>
+                            </div>
+                            <div className="flex">
+                              <MdOutlineSupportAgent size={24} />
+                              <a
+                                href="https://t.me/TRUSTPAY_1"
+                                className="text-black text-xl font-medium hover:underline ml-2 mr-2 mb-4"
+                              >
+                                Contact Support
+                              </a>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -645,8 +662,92 @@ const Transactions = () => {
                     footerStyle={{
                       backgroundColor: "rgb(250, 250, 242)",
                     }}
-                  ></Modal>
+                  >
+                  </Modal>
                 )}
+                <Modal
+                  title=""
+                  open={toggleTNCModal}
+                  footer={null}
+                  className="custom-modal"
+                  closable={true}
+                  centered
+                  width={600} // Ensure consistent width
+                  style={{ maxHeight: '80vh', overflowY: 'auto' }} // Handle long content in a scrollable manner
+                  onCancel={() => setTNCModal(false)}
+                >
+                  <div style={{ marginBottom: 16 }}>
+                    <h4><b>Terms and Conditions</b><span className="text-red-500">*</span></h4>
+                  </div>
+
+                  <div>
+                    <h5>1. Introduction and Definitions</h5>
+                    <p>Overview of the agreement and important definitions (e.g., "Merchant," "Service," "Transaction").</p>
+
+                    <h5>2. Services Provided</h5>
+                    <p>Description of the payment gateway services (e.g., processing payments, fraud detection, etc.).</p>
+
+                    <h5>3. Fees and Charges</h5>
+                    <p>Details of fees associated with the use of the payment gateway (e.g., transaction fees, monthly fees, chargeback fees).</p>
+
+                    <h5>4. Merchant Account Requirements</h5>
+                    <ul>
+                      <li>Eligibility criteria for merchants, such as business type, location, and financial standing.</li>
+                      <li>Agreement to provide necessary documentation to verify business identity.</li>
+                    </ul>
+
+                    <h5>5. Payment Processing</h5>
+                    <ul>
+                      <li>How payments are processed, including supported payment methods (credit cards, digital wallets, etc.).</li>
+                      <li>Processing timelines (e.g., settlement period for funds transfer to the merchant's bank account).</li>
+                    </ul>
+
+                    <h5>6. Chargebacks and Disputes</h5>
+                    <ul>
+                      <li>Explanation of chargeback procedures, responsibilities of the merchant and consumer in case of disputes.</li>
+                      <li>Merchant's obligation to handle customer complaints and issues.</li>
+                    </ul>
+
+                    <h5>7. Security and Fraud Prevention</h5>
+                    <ul>
+                      <li>Requirements for data security, including encryption and compliance with security standards (e.g., PCI DSS).</li>
+                      <li>How fraud prevention tools are implemented and the merchant's role in preventing fraudulent transactions.</li>
+                    </ul>
+
+                    <h5>8. Privacy and Data Protection</h5>
+                    <ul>
+                      <li>How personal and financial data is handled, stored, and protected in compliance with privacy laws (e.g., GDPR, CCPA).</li>
+                      <li>The merchant's responsibility for handling customer data appropriately.</li>
+                    </ul>
+
+                    <h5>9. Termination of Agreement</h5>
+                    <ul>
+                      <li>Conditions under which either party can terminate the agreement (e.g., breach of terms, non-payment, fraud detection).</li>
+                      <li>The process of deactivating accounts and processing pending transactions after termination.</li>
+                    </ul>
+
+                    <h5>10. Limitation of Liability</h5>
+                    <ul>
+                      <li>Limits on the liability of the payment gateway provider in case of system failures, fraud, or other issues.</li>
+                      <li>Merchant’s responsibility for maintaining proper records and managing customer relationships.</li>
+                    </ul>
+
+                    <h5>11. Compliance with Laws</h5>
+                    <p>Requirement for both the merchant and payment gateway to comply with relevant laws and regulations (e.g., anti-money laundering, data protection laws).</p>
+
+                    <h5>12. Amendments and Modifications</h5>
+                    <p>The ability of the payment gateway provider to change terms and conditions, with prior notice given to merchants.</p>
+
+                    <h5>13. Indemnity</h5>
+                    <p>The merchant's obligation to indemnify the payment gateway provider for any losses incurred due to the merchant's actions, such as fraud or violation of terms.</p>
+
+                    <h5>14. Dispute Resolution and Governing Law</h5>
+                    <ul>
+                      <li>Details on how disputes will be handled (e.g., mediation, arbitration).</li>
+                      <li>Which jurisdiction's laws apply to the agreement.</li>
+                    </ul>
+                  </div>
+                </Modal>
               </div>
             </>
           )}
