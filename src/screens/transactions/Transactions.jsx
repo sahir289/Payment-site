@@ -318,7 +318,7 @@ const handleIntentPay = async (amount, bankData) => {
         message.error(err.message);
     }
 }
-console.log(transactionsInformation, "transactionsInformation")
+
 const processPayment = async (amount, bankData) => {
     try {
         const razorpay = new Razorpay({
