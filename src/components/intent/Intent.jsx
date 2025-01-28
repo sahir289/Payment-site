@@ -73,6 +73,22 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
                     contact: '911000000000',
                     email: `${props.sno}.trustpay@gmail.com`
                 },
+                config: {
+                    display: {
+                        blocks: {
+                            upi: {
+                                name: "UPI",
+                                instruments: [
+                                    { method: "upi" },
+                                ],
+                            },
+                        },
+                        sequence: ["block.upi"], 
+                        preferences: {
+                            show_default_blocks: false, 
+                        },
+                    },
+                },
                 handler: checkPaymentStatusHandler,
             });
             razorpay.on('payment.failed', function (response) {

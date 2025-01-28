@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Tabs, Modal, Form, Input, Button, notification, Upload } from "antd";
+import { Spin, Tabs, Modal, Form, Input, Button, notification, Upload, message } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { FcRating } from "react-icons/fc";
 import { Upi, Bank, Intent } from "../../components";
@@ -25,7 +25,7 @@ const Transactions = () => {
   const [amount, setAmount] = useState("0.0");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionsInformation, setTransactionInformation] = useState(null);
-  const [paymentURL, setPaymentURL] = useState({});
+  const [paymentURL, setPaymentURL] = useState({}); 
   const [status, setStatus] = useState(null);
   const [paymentModel, setPaymentModel] = useState(false);
   const [modelData, setModelData] = useState({});
@@ -37,6 +37,7 @@ const Transactions = () => {
   const [showTrustPayModal, setShowTrustPayModal] = useState(false);
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
+  const [cashFree, setCashFee] = useState(false);
   const videoUrl = "https://drive.google.com/file/d/1EAGL_TTjx2kn_hsB6S0gE1x4-d1YywjP/preview";
 
   const _10_MINUTES = 1000 * 60 * 10;
@@ -224,7 +225,11 @@ const Transactions = () => {
       setIsBank(bankData.is_bank);
       setAllowIntent(bankData.allow_intent);
       setAllowMerchantIntent(bankData.allow_merchant_intent);
+      if(bankData.allow_intent && bankData.allow_merchant_intent){
+        handleIntentPay(amount, bankData);
+      }
     }
+
 
     setIsModalOpen(false);
   };
@@ -274,6 +279,120 @@ const Transactions = () => {
     const seconds = Math.floor(difference / 1000);
     timer = seconds > 0 ? seconds : 0;
   };
+
+  const cashfree_ = Cashfree({
+    "mode": "production"
+});
+
+// useEffect(() => {
+//     const randomBoolean = Math.random() < 0.5;
+//     setCashFee(randomBoolean);
+// }, []);
+
+const handleIntentPay = async (amount, bankData) => {
+    try {
+        if (loading) {
+            return;
+        }
+        // setLoading();
+        if (cashFree) {
+            const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
+            if (intentRes.error) {
+                message.error(intentRes.error.message);
+                return;
+            }
+            const sessionId = intentRes.data.data.payment_session_id;
+            cashfree_.checkout({
+                paymentSessionId: sessionId,
+                redirectTarget: "_modal"
+            });
+            // window.open(gateWayURLs[type], '_blank');
+            setLoading("");
+            return
+        }
+        await processPayment(amount, bankData);
+    } catch (err) {
+        setLoading("");
+        console.error(err);
+        message.error(err.message);
+    }
+}
+console.log(transactionsInformation, "transactionsInformation")
+const processPayment = async (amount, bankData) => {
+    try {
+        const razorpay = new Razorpay({
+            key: import.meta.env.VITE_RAZOR_PAY_ID,
+            name: "A2X Pay",
+            currency: "INR",
+            amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
+            notes: {
+                sno: bankData?.sno,
+                id: bankData?.id,
+            },
+            prefill: {
+                contact: '911000000000',
+                email: `${bankData?.sno}.trustpay@gmail.com`
+            },
+            config: {
+                display: {
+                    blocks: {
+                        upi: {
+                            name: "UPI",
+                            instruments: [
+                                { method: "upi" },
+                            ],
+                        },
+                    },
+                    sequence: ["block.upi"], 
+                    preferences: {
+                        show_default_blocks: false, 
+                    },
+                },
+            },
+            handler: checkIntentPaymentStatusHandler,
+        });
+        razorpay.on('payment.failed', function (response) {
+            handleUpdateTransactionStatus("402", response?.error?.description || "Unable to charge, payment has been cancelled");
+            if (response.error && response.error.description) {
+                message.error(response.error.description);
+            }
+        })
+        razorpay.open();
+        setLoading("");
+
+    } catch (err) {
+        console.log(err);
+        message.error('Error while processing payment!');
+        setLoading("");
+        handleUpdateTransactionStatus("500", err.message);
+    }
+}
+
+const handleUpdateTransactionStatus = async (status, message) => {
+    setStatus({
+        status,
+        message,
+    });
+}
+
+const checkIntentPaymentStatusHandler = async () => {
+    const token = params.token;
+    const res = await userAPI.checkPaymentStatus(token);
+    // res.data.data.amount = 500;
+    if (res?.error?.error?.status === 400) {
+        setInterval(() => {
+            setStatus({
+                status: "400",
+                message: "Url is Already expired!",
+            });
+        }, 10000);
+    }
+    else {
+        setPaymentModel(true);
+        setModelData(res?.data?.data);
+    }
+
+};
 
   return (
     <>
@@ -331,11 +450,11 @@ const Transactions = () => {
                         <Bank {...transactionsInformation} amount={amount} />
                       </Tabs.TabPane>
                     )}
-                    {(allow_intent && allow_merchant_intent) && (
+                    {/* {(allow_intent && allow_merchant_intent) && (
                       <Tabs.TabPane tab="UPI Intent" key="3">
                         <Intent {...transactionsInformation} amount={amount} paymentURL={paymentURL} params={params} setStatus={setStatus} />
                       </Tabs.TabPane>
-                    )}
+                    )} */}
                   </Tabs>
                   {(!allow_intent || !allow_merchant_intent) && (isQr || isBank) && <Tabs
                     defaultActiveKey="1"
