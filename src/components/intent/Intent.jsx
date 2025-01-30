@@ -62,7 +62,7 @@ const Intent = ({ ac_name, ac_no, bank_name, ifsc, amount, paymentURL = {}, name
         try {
             const razorpay = new Razorpay({
                 key: import.meta.env.VITE_RAZOR_PAY_ID,
-                name: "A2X Pay",
+                name: "Payment Gateway",
                 currency: "INR",
                 amount: amount * 100, // need to multiply with 100 because amount here in 'paisa'
                 notes: {
