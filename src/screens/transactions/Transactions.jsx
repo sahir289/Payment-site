@@ -280,10 +280,10 @@ const Transactions = () => {
     "mode": "production"
   });
 
-  // useEffect(() => {
-  //     const randomBoolean = Math.random() < 0.5;
-  //     setCashFee(randomBoolean);
-  // }, []);
+  useEffect(() => {
+      const randomBoolean = Math.random() < 0.5;
+      setCashFee(randomBoolean);
+  }, []);
 
   const handleIntentPay = async (amount, bankData) => {
     try {
