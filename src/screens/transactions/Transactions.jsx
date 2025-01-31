@@ -297,17 +297,11 @@ const Transactions = () => {
         cashfree_.checkout({
           paymentSessionId: sessionId,
           redirectTarget: "_modal",
-          paymentMethods: {
-            upi: true,
-            card: false,
-            netbanking: false,
-            wallet: false,
-            paylater: false
-          },
+          paymentMethod: ["upi"],
           theme: {
-            color: "#2C86FF",
-            fontFamily: "Arial, sans-serif", 
-            backgroundColor: "#FFFFFF", 
+            color: "#2C86FF",  
+            backgroundColor: "#FFFFFF",
+            // logo: "https://yourwebsite.com/logo.png",
           },
           name: "Payment Gateway",
         });
