@@ -299,8 +299,8 @@ const Transactions = () => {
           redirectTarget: "_modal",
           paymentMethod: ["upi"],
           theme: {
-            color: "#2C86FF",  
-            backgroundColor: "#FFFFFF",
+            color:  "#FFFFFF",  
+            backgroundColor: "#2C86FF",
             // logo: "https://yourwebsite.com/logo.png",
           },
           name: "Payment Gateway",
