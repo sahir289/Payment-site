@@ -296,7 +296,20 @@ const Transactions = () => {
         const sessionId = intentRes.data.data.payment_session_id;
         cashfree_.checkout({
           paymentSessionId: sessionId,
-          redirectTarget: "_modal"
+          redirectTarget: "_modal",
+          paymentMethods: {
+            upi: true,
+            card: false,
+            netbanking: false,
+            wallet: false,
+            paylater: false
+          },
+          theme: {
+            color: "#2C86FF",
+            fontFamily: "Arial, sans-serif", 
+            backgroundColor: "#FFFFFF", 
+          },
+          name: "Payment Gateway",
         });
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
