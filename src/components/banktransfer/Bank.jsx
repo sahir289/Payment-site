@@ -5,7 +5,7 @@ import { MdCopyAll } from "react-icons/md";
 import { copyToClipboard } from '../../utils';
 import "./Bank.css"
 
-const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
+const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount, name, }) => {
 
 
   return (
@@ -81,6 +81,9 @@ const Bank = ({ ac_name, ac_no, bank_name, ifsc, amount , name , }) => {
               />
             </div>
           </div>
+        </div>
+        <div className="section-to text-xs mt-2">
+          <span className='text-red-500'><b>ATTENTION: </b>These details are valid for the next 10 minutes. If payment is made after this period, you will be responsible for any potential losses.</span>
         </div>
         <Divider />
       </div>
