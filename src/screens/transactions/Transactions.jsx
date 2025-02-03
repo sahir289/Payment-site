@@ -332,7 +332,7 @@ const Transactions = () => {
         });
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
-        checkIntentPaymentStatusHandler();
+        return checkIntentPaymentStatusHandler();
       } else{
         setRazorpay(true);
         await processPayment(amount, bankData);
