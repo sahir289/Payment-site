@@ -40,6 +40,7 @@ const Transactions = () => {
   const isTestMode = queryParams.get("t");
   const [cashFree, setCashFee] = useState(false);
   const [razorpay, setRazorpay] = useState(false);
+  const [expired, setExpired] = useState(false);
   const videoUrl = "https://drive.google.com/file/d/1EAGL_TTjx2kn_hsB6S0gE1x4-d1YywjP/preview";
 
   const _10_MINUTES = 1000 * 60 * 10;
@@ -50,23 +51,25 @@ const Transactions = () => {
   let expireTime = Date.now() + _10_MINUTES;
 
   useEffect(() => {
-    let timeoutDuration = null;
-
-    if (cashFree) {
-      timeoutDuration = _5_MINUTES;
-    } else if (razorpay) {
-      timeoutDuration = _12_MINUTES;
-    }
+    let timeoutDuration = cashFree ? _5_MINUTES : razorpay ? _12_MINUTES : null;
 
     if (timeoutDuration) {
-      const timer = setTimeout(() => {
-        window.location.reload();
-      }, timeoutDuration);
+      const expiryTime = Date.now() + timeoutDuration;
+      sessionStorage.setItem("expiryTime", expiryTime);
 
-      return () => clearTimeout(timer);
+      const storedExpiryTime = sessionStorage.getItem("expiryTime");
+      if (storedExpiryTime && Date.now() > storedExpiryTime) {
+        setExpired(true);
+      } else {
+        const timer = setTimeout(() => {
+          window.location.reload();
+        }, timeoutDuration);
+
+        return () => clearTimeout(timer);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cashFree, razorpay]);
+  }, [cashFree, razorpay, expired]);
 
   useEffect(() => {
     // listener for tab or window focus
