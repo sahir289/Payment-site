@@ -39,11 +39,34 @@ const Transactions = () => {
   const queryParams = new URLSearchParams(location.search);
   const isTestMode = queryParams.get("t");
   const [cashFree, setCashFee] = useState(false);
+  const [razorpay, setRazorpay] = useState(false);
   const videoUrl = "https://drive.google.com/file/d/1EAGL_TTjx2kn_hsB6S0gE1x4-d1YywjP/preview";
 
   const _10_MINUTES = 1000 * 60 * 10;
+  const _12_MINUTES = 1000 * 60 * 12;
+  const _5_MINUTES = 1000 * 60 * 5;
+
   let timer = 60 * 10;
   let expireTime = Date.now() + _10_MINUTES;
+
+  useEffect(() => {
+    let timeoutDuration = null;
+
+    if (cashFree) {
+      timeoutDuration = _5_MINUTES;
+    } else if (razorpay) {
+      timeoutDuration = _12_MINUTES;
+    }
+
+    if (timeoutDuration) {
+      const timer = setTimeout(() => {
+        window.location.reload();
+      }, timeoutDuration);
+
+      return () => clearTimeout(timer);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cashFree, razorpay]);
 
   useEffect(() => {
     // listener for tab or window focus
@@ -301,15 +324,16 @@ const Transactions = () => {
           theme: {
             color:  "#FFFFFF",  
             backgroundColor: "#2C86FF",
-            // logo: "https://yourwebsite.com/logo.png",
           },
           name: "Payment Gateway",
         });
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
         return
+      } else{
+        setRazorpay(true);
+        await processPayment(amount, bankData);
       }
-      await processPayment(amount, bankData);
     } catch (err) {
       setLoading("");
       console.error(err);
