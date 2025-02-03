@@ -333,7 +333,6 @@ const Transactions = () => {
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
         checkIntentPaymentStatusHandler();
-        return
       } else{
         setRazorpay(true);
         await processPayment(amount, bankData);
