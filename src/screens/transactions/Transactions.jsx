@@ -332,6 +332,7 @@ const Transactions = () => {
         });
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
+        checkIntentPaymentStatusHandler;
         return
       } else{
         setRazorpay(true);
@@ -412,8 +413,7 @@ const Transactions = () => {
           message: "Url is Already expired!",
         });
       }, 10000);
-    }
-    else {
+    } else {
       setPaymentModel(true);
       setModelData(res?.data?.data);
     }
