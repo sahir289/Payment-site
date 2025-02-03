@@ -117,6 +117,21 @@ const Transactions = () => {
     videoUrl(url);
   };
 
+  const pollPaymentStatus = () => {
+    const interval = setInterval(async () => {
+      const token = params.token;
+      const res = await userAPI.checkPaymentStatus(token);
+  
+      if (res?.data?.data?.status === "SUCCESS") {
+        clearInterval(interval);
+        setPaymentModel(true);
+        setModelData(res?.data?.data);
+      } else if (res?.data?.data?.status === "FAILED") {
+        clearInterval(interval);
+      }
+    }, 10000);
+  };
+
   const checkPaymentStatusHandler = async () => {
     const token = params.token;
     const res = await userAPI.checkPaymentStatus(token);
@@ -332,7 +347,8 @@ const Transactions = () => {
         });
         // window.open(gateWayURLs[type], '_blank');
         setLoading("");
-        return checkIntentPaymentStatusHandler();
+        pollPaymentStatus();
+        return 
       } else{
         setRazorpay(true);
         await processPayment(amount, bankData);
