@@ -692,7 +692,7 @@ const Transactions = () => {
                                 Terms & Conditions <span className="text-red-500">*</span>
                               </button>
                             </div>
-                            <div className="flex">
+                            {/* <div className="flex">
                               <MdOutlineSupportAgent size={24} />
                               <a
                                 href="https://t.me/TRUSTPAY_1"
@@ -700,7 +700,7 @@ const Transactions = () => {
                               >
                                 Contact Support
                               </a>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>
