@@ -318,7 +318,7 @@ const Transactions = () => {
   };
 
   const cashfree_ = Cashfree({
-    "mode": "production"
+    "mode": "sandbox"
   });
 
   useEffect(() => {
@@ -328,7 +328,7 @@ const Transactions = () => {
 
   const handleIntentPay = async (amount, bankData) => {
     try {
-      if (cashFree) {
+      // if (cashFree) {
         const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
         if (intentRes.error) {
           message.error(intentRes.error.message);
@@ -349,10 +349,11 @@ const Transactions = () => {
         setLoading("");
         pollPaymentStatus();
         return 
-      } else{
-        setRazorpay(true);
-        await processPayment(amount, bankData);
-      }
+      // } 
+      // else{
+      //   setRazorpay(true);
+      //   await processPayment(amount, bankData);
+      // }
     } catch (err) {
       setLoading("");
       console.error(err);
