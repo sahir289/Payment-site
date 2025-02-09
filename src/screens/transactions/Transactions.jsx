@@ -318,7 +318,7 @@ const Transactions = () => {
   };
 
   const cashfree_ = Cashfree({
-    "mode": "sandbox"
+    "mode": "production"
   });
 
   useEffect(() => {
