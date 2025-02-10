@@ -644,13 +644,13 @@ const Transactions = () => {
                           >
                             English
                           </a>
-                          <div className="flex justify-between">
+                          {(allow_intent && allow_merchant_intent) && <div className="flex justify-between">
                             <div className="flex ml-2 mb-4">
                               <button onClick={() => setTNCModal(true)}>
                                 Terms & Conditions <span className="text-red-500">*</span>
                               </button>
                             </div>
-                            {/* <div className="flex">
+                            <div className="flex">
                               <MdOutlineSupportAgent size={24} />
                               <a
                                 href="https://t.me/TRUSTPAY_1"
@@ -658,8 +658,8 @@ const Transactions = () => {
                               >
                                 Contact Support
                               </a>
-                            </div> */}
-                          </div>
+                            </div>
+                          </div>}
                         </div>
                       </div>
                     </div>
