@@ -41,6 +41,7 @@ const Transactions = () => {
   const [cashFree, setCashFee] = useState(false);
   const [razorpay, setRazorpay] = useState(false);
   const [expired, setExpired] = useState(false);
+
   const videoUrl = "https://drive.google.com/file/d/1EAGL_TTjx2kn_hsB6S0gE1x4-d1YywjP/preview";
 
   const _10_MINUTES = 1000 * 60 * 10;
@@ -326,29 +327,81 @@ const Transactions = () => {
       setCashFee(randomBoolean);
   }, []);
 
+  const initiatePayment = async (amount) => {
+    try {
+        const response = await userAPI.generateIntentOrder(params.token, { amount });
+        const { hash, key, txnid, productinfo, firstname, email, surl, furl, udf1, udf2, udf3, udf4, udf5} = response.data.data;
+
+        // Create form dynamically
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://secure.payu.in/_payment";
+        // form.target = "_blank";
+
+        // Append hidden fields
+        const fields = [
+          { name: "key", value: key },
+          { name: "txnid", value: txnid },
+          { name: "amount", value: amount },
+          { name: "productinfo", value: productinfo },
+          { name: "firstname", value: firstname },
+          { name: "udf1", value: udf1 || "" },
+          { name: "udf2", value: udf2 || "" },
+          { name: "udf3", value: udf3 || "" },
+          { name: "udf4", value: udf4 || "" },
+          { name: "udf5", value: udf5 || "" },
+          { name: "email", value: email },
+          { name: "surl", value: surl },
+          { name: "furl", value: furl },
+          { name: "hash", value: hash },
+          { name: "pg", value: "UPI" }, // Ensures only UPI is selected
+          { name: "enforce_paymethod", value: "upi,creditcard,debitcard" }, 
+      ];
+
+      fields.forEach(({ name, value }) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => form.remove(), 1000);
+    } catch (error) {
+        console.error("Error generating hash:", error);
+    }
+};
+
   const handleIntentPay = async (amount, bankData) => {
     try {
-      // if (cashFree) {
-        const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
-        if (intentRes.error) {
-          message.error(intentRes.error.message);
-          return;
+      const payU = true;
+      if(payU){
+          initiatePayment(amount);
         }
-        const sessionId = intentRes.data.data.payment_session_id;
-        cashfree_.checkout({
-          paymentSessionId: sessionId,
-          redirectTarget: "_modal",
-          paymentMethod: ["upi"],
-          theme: {
-            color:  "#FFFFFF",  
-            backgroundColor: "#2C86FF",
-          },
-          name: "Payment Gateway",
-        });
-        // window.open(gateWayURLs[type], '_blank');
-        setLoading("");
-        pollPaymentStatus();
-        return 
+
+      // if (cashFree) {
+      //   const intentRes = await userAPI.generateIntentOrder(params.token, { amount });
+      //   if (intentRes.error) {
+      //     message.error(intentRes.error.message);
+      //     return;
+      //   }
+      //   const sessionId = intentRes.data.data.payment_session_id;
+      //   cashfree_.checkout({
+      //     paymentSessionId: sessionId,
+      //     redirectTarget: "_modal",
+      //     paymentMethod: ["upi"],
+      //     theme: {
+      //       color:  "#FFFFFF",  
+      //       backgroundColor: "#2C86FF",
+      //     },
+      //     name: "Payment Gateway",
+      //   });
+      //   // window.open(gateWayURLs[type], '_blank');
+      //   setLoading("");
+      //   pollPaymentStatus();
+      //   return 
       // } 
       // else{
       //   setRazorpay(true);
