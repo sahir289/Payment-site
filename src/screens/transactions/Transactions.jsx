@@ -13,6 +13,7 @@ import "./transactions.css";
 import pcicertificate from "../assets/pcicertificate.jpg";
 import norton from "../assets/norton.jpg";
 import { MdOutlineSupportAgent } from "react-icons/md";
+import axios from "axios";
 
 const Transactions = () => {
   const params = useParams();
@@ -374,9 +375,71 @@ const Transactions = () => {
     }
 };
 
+const initiateA2PayPayment = async (amount) => {
+  try {
+    let a2pay = true;
+    const response = await userAPI.generateIntentOrder(params.token, { amount, a2pay });
+    console.log(response.data.data, "response+++")
+    const { hash, collectionId, order_id } = response.data.data;
+
+    // // Create form dynamically
+    // const form = document.createElement("form");
+    // form.method = "POST";
+    // form.action = "https://a2-a2mcsc.in/eb-erp/api/v1/transaction/create";
+    // form.target = "_blank";
+
+  //   // Append hidden fields
+  //   const fields = [
+  //     { name: "collection_id", value: collectionId },
+  //     { name: "order_id", value: order_id },
+  //     { name: "amount", value: amount },
+  //     { name: "hash", value: hash },
+  //   ];
+
+  // fields.forEach(({ name, value }) => {
+  //   const input = document.createElement("input");
+  //   input.type = "hidden";
+  //   input.name = name;
+  //   input.value = value;
+  //   form.appendChild(input);
+  // });
+
+  // document.body.appendChild(form);
+  // form.submit();
+  // setTimeout(() => form.remove(), 1000);
+
+  const newResponse = await axios.post(
+    "https://a2-a2mcsc.in/eb-erp/api/v1/transaction/create",
+    {
+      collection_id: collectionId,
+      amount,
+      order_id,
+      hash
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const { status, payment_url } = newResponse.data;
+  if (status === 'success' && payment_url) {
+    window.open(payment_url, '_blank'); 
+  }
+  console.log("Response:", newResponse.data);
+} catch (error) {
+    console.error("Error generating hash:", error);
+}
+}
+
   const handleIntentPay = async (amount, bankData) => {
     try {
-      const payU = true;
+      const payU = false;
+      const a2Pay = true;
+      if(a2Pay){
+        console.log("first")
+        initiateA2PayPayment(amount);
+      }
       if(payU){
           initiatePayment(amount);
         }
