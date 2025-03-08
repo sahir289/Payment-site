@@ -380,13 +380,11 @@ const initiateA2PayPayment = async (amount) => {
     let a2pay = true;
     const response = await userAPI.generateIntentOrder(params.token, { amount, a2pay });
     const { status, payment_url } = response.data.data;
-    console.log(response.data.data, "payment_url");
-
-  if (status === 'success' && payment_url) {
-    window.location.href = payment_url;
-  } else {
-    window.location.reload();
-  }
+    if (status === 'success' && payment_url) {
+      window.location.href = payment_url;
+    } else {
+      window.location.reload();
+    }
 
   } catch (error) {
       console.error("Error generating hash:", error);
