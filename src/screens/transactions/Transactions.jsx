@@ -189,6 +189,7 @@ const Transactions = () => {
   };
 
   const handleUtrNumber = async (data) => {
+    if (processing) return;
     const updateData = {
       usrSubmittedUtr: data?.utrNumber?.trim(),
       code: transactionsInformation?.code,
@@ -280,6 +281,7 @@ const Transactions = () => {
   };
 
   const handleImgSubmit = async (data) => {
+    if (processing) return;
     const token = params.token;
     const fileData = data.img[0];
     if (!fileData) {
